@@ -1,3 +1,5 @@
 <Solution>
-  <Project Path="EmuDiscDriveGUI.csproj" />
+  <Project Path="EmuDiscDriveGUI.csproj">
+    <BuildType Project="Release" />
+  </Project>
 </Solution>
