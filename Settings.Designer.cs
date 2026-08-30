@@ -28,38 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
-            MainContainer = new TableLayoutPanel();
             SuspendLayout();
-            // 
-            // MainContainer
-            // 
-            MainContainer.AutoSize = true;
-            MainContainer.ColumnCount = 2;
-            MainContainer.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 386F));
-            MainContainer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            MainContainer.Dock = DockStyle.Fill;
-            MainContainer.Location = new Point(0, 0);
-            MainContainer.Name = "MainContainer";
-            MainContainer.RowCount = 2;
-            MainContainer.RowStyles.Add(new RowStyle(SizeType.Percent, 53.77778F));
-            MainContainer.RowStyles.Add(new RowStyle(SizeType.Percent, 46.22222F));
-            MainContainer.Size = new Size(800, 450);
-            MainContainer.TabIndex = 0;
             // 
             // Settings
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
-            Controls.Add(MainContainer);
+            ClientSize = new Size(1201, 758);
             Name = "Settings";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Settings";
+            WindowState = FormWindowState.Maximized;
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
-
-        private TableLayoutPanel MainContainer;
     }
 }
