@@ -20,6 +20,7 @@ namespace EmuDiscDriveGUI
         private const uint WM_DEVICECHANGE = 0x0219;
         private const int DBT_DEVICEARRIVAL = 0x8000;
         private const int DBT_DEVICEREMOVECOMPLETE = 0x8004;
+        private ProcessDisc pd;
 
         public static class AppService
         {
@@ -31,8 +32,6 @@ namespace EmuDiscDriveGUI
             public static TaskCompletionSource<bool> EmuLoaded { get; } = new();
             //add more if needed
         }
-
-        private ProcessDisc pd;
         public MainWindow()
         {
             InitializeComponent();
@@ -101,18 +100,32 @@ namespace EmuDiscDriveGUI
         public void MakeDiscImgRun()
         {
             Disc.Image = Properties.Resources.readingDisc;
+            //Disc.SizeMode = PictureBoxSizeMode.CenterImage;
         }
         public void turnOffOnSetting(bool swtich)
         {
             if (swtich)
             {
-                SettingButton.Enabled = true;
                 SettingButton.Visible = true;
             }
             else
             {
-                SettingButton.Enabled = false;
                 SettingButton.Visible = false;
+            }
+        }
+        public void cacheValue(int value)
+        {
+            CacheBar.Value = value;
+        }
+        public void CacheBarVis(bool swtich)
+        {
+            if (swtich)
+            {
+                CacheBar.Visible = true;
+            }
+            else
+            {
+                CacheBar.Visible = false;
             }
         }
 
@@ -133,19 +146,16 @@ namespace EmuDiscDriveGUI
         private void SettingButton_Click(object sender, EventArgs e)
         {
             AppService.InSettings = true;
-            Settings settingsForm = new Settings();
-            settingsForm.Location = this.Location;
-            settingsForm.StartPosition = FormStartPosition.CenterParent;
-
-            settingsForm.FormClosing += (s, args) => {
-                this.Show();
-                AppService.InSettings = false;
-                pd.InitForm(this);
-            };
-            settingsForm.Show();
-            this.Hide();
+            using(Settings settingsForm = new Settings())
+            {
+                settingsForm.ShowDialog();
+            }
+            Console.WriteLine("To you 5000 years from now");
+            AppService.InSettings = false;
+            pd.InitForm(this);
         }
     }
+
     [JsonSourceGenerationOptions(WriteIndented = false)]
     [JsonSerializable(typeof(EmuPath))]
     internal partial class AppJsonContext : JsonSerializerContext { }

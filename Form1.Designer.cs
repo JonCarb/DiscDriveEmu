@@ -28,85 +28,86 @@
         /// </summary>
         private void InitializeComponent()
         {
-            MainPanel = new TableLayoutPanel();
-            Description = new Label();
+            MainTable = new TableLayoutPanel();
             Disc = new PictureBox();
-            tableLayoutPanel1 = new TableLayoutPanel();
+            Description = new Label();
+            CacheBar = new ProgressBar();
             SettingButton = new Button();
-            MainPanel.SuspendLayout();
+            MainTable.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)Disc).BeginInit();
-            tableLayoutPanel1.SuspendLayout();
             SuspendLayout();
             // 
-            // MainPanel
+            // MainTable
             // 
-            MainPanel.ColumnCount = 1;
-            MainPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            MainPanel.Controls.Add(Description, 0, 1);
-            MainPanel.Controls.Add(Disc, 0, 0);
-            MainPanel.Dock = DockStyle.Fill;
-            MainPanel.Location = new Point(0, 0);
-            MainPanel.Name = "MainPanel";
-            MainPanel.RowCount = 2;
-            MainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            MainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 279F));
-            MainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            MainPanel.Size = new Size(2145, 945);
-            MainPanel.TabIndex = 1;
-            // 
-            // Description
-            // 
-            Description.BackColor = Color.Transparent;
-            Description.Dock = DockStyle.Top;
-            Description.FlatStyle = FlatStyle.Flat;
-            Description.Font = new Font("Verdana", 50.25F, FontStyle.Italic, GraphicsUnit.Point, 0);
-            Description.ForeColor = SystemColors.Control;
-            Description.Location = new Point(3, 666);
-            Description.Name = "Description";
-            Description.Size = new Size(2139, 86);
-            Description.TabIndex = 1;
-            Description.Text = "Please insert a Disc";
-            Description.TextAlign = ContentAlignment.MiddleCenter;
+            MainTable.ColumnCount = 2;
+            MainTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            MainTable.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 8F));
+            MainTable.Controls.Add(Disc, 0, 1);
+            MainTable.Controls.Add(Description, 0, 2);
+            MainTable.Controls.Add(CacheBar, 0, 3);
+            MainTable.Controls.Add(SettingButton, 0, 4);
+            MainTable.Dock = DockStyle.Fill;
+            MainTable.Location = new Point(0, 0);
+            MainTable.Name = "MainTable";
+            MainTable.RowCount = 5;
+            MainTable.RowStyles.Add(new RowStyle(SizeType.Percent, 18.4496117F));
+            MainTable.RowStyles.Add(new RowStyle(SizeType.Percent, 81.5503845F));
+            MainTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 81F));
+            MainTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 177F));
+            MainTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 69F));
+            MainTable.Size = new Size(1740, 973);
+            MainTable.TabIndex = 0;
             // 
             // Disc
             // 
-            Disc.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            Disc.BackgroundImageLayout = ImageLayout.Zoom;
+            Disc.Dock = DockStyle.Fill;
             Disc.Image = Properties.Resources.spinningDisc;
-            Disc.Location = new Point(3, 3);
+            Disc.Location = new Point(3, 122);
             Disc.Name = "Disc";
-            Disc.Size = new Size(2139, 660);
+            Disc.Size = new Size(1726, 520);
             Disc.SizeMode = PictureBoxSizeMode.Zoom;
-            Disc.TabIndex = 2;
+            Disc.TabIndex = 7;
             Disc.TabStop = false;
             // 
-            // tableLayoutPanel1
+            // Description
             // 
-            tableLayoutPanel1.ColumnCount = 2;
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 1073F));
-            tableLayoutPanel1.Controls.Add(SettingButton, 0, 0);
-            tableLayoutPanel1.Dock = DockStyle.Bottom;
-            tableLayoutPanel1.Location = new Point(0, 945);
-            tableLayoutPanel1.Name = "tableLayoutPanel1";
-            tableLayoutPanel1.RowCount = 1;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel1.Size = new Size(2145, 70);
-            tableLayoutPanel1.TabIndex = 2;
+            Description.AutoSize = true;
+            Description.BackColor = Color.Transparent;
+            Description.Dock = DockStyle.Fill;
+            Description.FlatStyle = FlatStyle.Flat;
+            Description.Font = new Font("Verdana", 35F, FontStyle.Italic, GraphicsUnit.Point, 0);
+            Description.ForeColor = SystemColors.Control;
+            Description.Location = new Point(3, 645);
+            Description.Name = "Description";
+            Description.Size = new Size(1726, 81);
+            Description.TabIndex = 8;
+            Description.Text = "Please insert a Disc";
+            Description.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // CacheBar
+            // 
+            CacheBar.Anchor = AnchorStyles.Top;
+            CacheBar.Location = new Point(397, 729);
+            CacheBar.Name = "CacheBar";
+            CacheBar.Size = new Size(937, 23);
+            CacheBar.TabIndex = 9;
+            CacheBar.Visible = false;
             // 
             // SettingButton
             // 
-            SettingButton.BackColor = Color.FromArgb(30, 30, 30);
+            SettingButton.Anchor = AnchorStyles.Right;
+            SettingButton.BackColor = Color.FromArgb(35, 35, 35);
             SettingButton.Cursor = Cursors.Hand;
-            SettingButton.Dock = DockStyle.Left;
             SettingButton.FlatAppearance.BorderSize = 0;
             SettingButton.FlatStyle = FlatStyle.Flat;
-            SettingButton.Font = new Font("Yu Gothic", 10F, FontStyle.Bold);
+            SettingButton.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             SettingButton.ForeColor = Color.White;
-            SettingButton.Location = new Point(3, 3);
+            SettingButton.Location = new Point(1509, 913);
             SettingButton.Name = "SettingButton";
-            SettingButton.Size = new Size(120, 64);
+            SettingButton.Size = new Size(220, 50);
             SettingButton.TabIndex = 0;
-            SettingButton.Text = "Settings";
+            SettingButton.Text = "⚙️ Settings";
             SettingButton.UseVisualStyleBackColor = false;
             SettingButton.Click += SettingButton_Click;
             // 
@@ -114,28 +115,29 @@
             // 
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
-            BackColor = SystemColors.ActiveCaptionText;
+            BackColor = Color.Black;
             BackgroundImageLayout = ImageLayout.Zoom;
-            ClientSize = new Size(2145, 1015);
-            Controls.Add(MainPanel);
-            Controls.Add(tableLayoutPanel1);
+            ClientSize = new Size(1740, 973);
+            Controls.Add(MainTable);
             DoubleBuffered = true;
             FormBorderStyle = FormBorderStyle.None;
             Name = "MainWindow";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Disc Reader";
+            TransparencyKey = Color.Blue;
             WindowState = FormWindowState.Maximized;
-            MainPanel.ResumeLayout(false);
+            MainTable.ResumeLayout(false);
+            MainTable.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)Disc).EndInit();
-            tableLayoutPanel1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
-        private TableLayoutPanel MainPanel;
-        private PictureBox Disc;
+
+        private TableLayoutPanel MainTable;
         private Label Description;
-        private TableLayoutPanel tableLayoutPanel1;
+        private ProgressBar CacheBar;
+        private PictureBox Disc;
         private Button SettingButton;
     }
 }

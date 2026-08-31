@@ -29,8 +29,6 @@ namespace EmuDiscDriveGUI
 
             await AppService.EmuLoaded.Task;
 
-            await Task.Delay(1000); //Give UI thread time to init 
-
             await Task.Run(() =>
             {
                 discDrive = DriveInfo.GetDrives().FirstOrDefault(d => d.DriveType == DriveType.CDRom)?.Name ?? "NULL";
@@ -167,11 +165,11 @@ namespace EmuDiscDriveGUI
                 Cache ca = new Cache();
 
                 //CacheProgressBar.Visibility = Visibility.Visible;
-                //CacheProgressBar.Value = 0;
-
+                form.CacheBarVis(true);
+                form.cacheValue(0);
                 var progress = new Progress<double>(percentage =>
                 {
-                    //CacheProgressBar.Value = percentage;
+                    form.cacheValue((int) percentage);
                     form.ChangeDesc($"Installing Disc {percentage:F0}%");
                 });
 
@@ -180,11 +178,11 @@ namespace EmuDiscDriveGUI
                     return await ca.CacheGame(gameName, gamePath, progress);
                 });
 
-                //CacheProgressBar.Visibility = Visibility.Collapsed;
+                form.CacheBarVis(false);
 
                 if (copy is null)
                 {
-                    form.DisplayError("Cache Error: Playing off Disc!");
+                    form.DisplayError("Cache Error/Interupted!");
                     return;
                 }
 
