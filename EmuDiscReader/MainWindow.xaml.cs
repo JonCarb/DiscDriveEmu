@@ -1,4 +1,5 @@
 ﻿using DiscUtils.Raw;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -8,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -32,17 +34,44 @@ namespace EmuDiscReader
             public static TaskCompletionSource<bool> EmuLoaded { get; } = new();
             //add more if needed
         }
+        private const uint WM_DEVICECHANGE = 0x0219;
+        private const int DBT_DEVICEARRIVAL = 0x8000;
+        private const int DBT_DEVICEREMOVECOMPLETE = 0x8004;
         private ProcessDisc pd;
         public MainWindow()
         {
             InitializeComponent();
+            SourceInitialized += MainWindow_SourceInitialized;
             Console.WriteLine("To you 5000 years from now");
             LoadEmulatorJson();
-            AppService.CacheGame = true;
-
+            AppService.CacheGame = false;
             pd = new ProcessDisc();
             pd.CheckDisc(this);
         }
+        private void MainWindow_SourceInitialized(object? sender, EventArgs e)
+        {
+            HwndSource source = (HwndSource)PresentationSource.FromVisual(this)!;
+            source.AddHook(WndProc);
+        }
+        private IntPtr WndProc( IntPtr hwnd,int msg,IntPtr wParam,IntPtr lParam, ref bool handled)
+        {
+            if (msg == WM_DEVICECHANGE)
+            {
+                switch (wParam.ToInt32())
+                {
+                    case DBT_DEVICEARRIVAL:
+                        pd.CheckDisc(this);
+                        break;
+
+                    case DBT_DEVICEREMOVECOMPLETE:
+                        DisplayError("Disc Tray Was Opened");
+                        break;
+                }
+            }
+
+            return IntPtr.Zero;
+        }
+
 
         private static async void LoadEmulatorJson()
         {
@@ -133,6 +162,16 @@ namespace EmuDiscReader
             ImageBehavior.SetAnimatedSource(Disc, new BitmapImage(new Uri(
                 "pack://application:,,,/EmuDiscReader;component/Assets/spinningDisc.gif")));
             Description.Text = "Please insert a Disc";
+        }
+
+        private void SettingsBTN_Click(object sender, RoutedEventArgs e)
+        {
+            AppService.InSettings = true;
+            Settings setWin = new Settings();
+            setWin.Owner = this;
+            setWin.ShowDialog();
+            AppService.InSettings = false;
+            pd.CheckDisc(this);
         }
     }
 

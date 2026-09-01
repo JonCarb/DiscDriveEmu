@@ -159,13 +159,13 @@ namespace EmuDiscReader
             {
                 Console.WriteLine("About to cache: Game Name: " + gameName + " game Path: " + gamePath);
                 Cache ca = new Cache();
-
+                MainForm.ChangeDesc("Installing Game");
                 MainForm.CacheBarVis(true);
                 MainForm.InstallBarValue(0);
                 var progress = new Progress<double>(percentage =>
                 {
                     MainForm.InstallBarValue(percentage);
-                    MainForm.ChangeDesc($"Installing Disc {percentage:F0}%");
+                    MainForm.ChangeDesc($"Installing Game {percentage:F0}%");
                 });
 
                 StorageFile? copy = await Task.Run(async () =>
@@ -211,6 +211,7 @@ namespace EmuDiscReader
                 default:
                     MainForm.DisplayError("Unknown/Unsupported Disc"); return;
             }
+            MainForm.ChangeDesc("Starting Game");
             await Task.Delay(2000);
             System.Windows.Application.Current.Shutdown();
         }

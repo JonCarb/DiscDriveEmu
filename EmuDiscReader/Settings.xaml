@@ -1,0 +1,26 @@
+﻿<Window x:Class="EmuDiscReader.Settings"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EmuDiscReader"
+        mc:Ignorable="d"
+        Title="Settings" Height="800" Width="700">
+    <Grid Background="Black">
+
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Background="Black">
+            <TextBlock x:Name="Label" Text="Supported Emulators" FontSize="50" FontStyle="Italic" Foreground="White" Margin="0,0,0,20" FontWeight="Bold" HorizontalAlignment="Center" />
+
+            <TextBlock x:Name="Dolphin" Text="Dolphin Path:" FontStyle="Italic" Foreground="White" FontSize="22" Margin="10,0,0,0"/>
+            <TextBlock x:Name="Xemu" Text="Xemu Path:" FontStyle="Italic" Foreground="White" FontSize="22" Margin="10,0,0,0"/>
+            <TextBlock x:Name="PCSX2" Text="PCSX2 Path:" FontStyle="Italic" Foreground="White" FontSize="22" Margin="10,0,0,0"/>
+            <TextBlock x:Name="RPCS3" Text="RPCS3 Path:"  FontStyle="Italic" Foreground="White" FontSize="22" Margin="10,0,0,0"/>
+            <TextBlock x:Name="Cemu" Text="Cemu Path:"  FontStyle="Italic" Foreground="White" FontSize="22" Margin="10,0,0,0"/>
+
+            <Button x:Name="AddPath" Width="200" Height="35" HorizontalAlignment="Right" 
+            Background="White" FontSize="22" Content="Add Emulator Path" Margin="0,15,0,0" 
+            FontFamily="Yu Gothic UI" Cursor="Hand" VerticalAlignment="Bottom" Foreground="Black" BorderBrush="White" Click="AddPath_Click"/>
+        </StackPanel>
+
+    </Grid>
+</Window>
