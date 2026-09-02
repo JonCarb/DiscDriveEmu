@@ -42,7 +42,7 @@ namespace EmuDiscReader
             if (MainForm == null) { Console.WriteLine("Form is null"); return; }
 
             //Disable Settings Button
-            MainForm.buttonVisble(false);
+            MainForm.ButtonVisble(false);
 
             await Task.Run(() =>
             {
@@ -125,7 +125,7 @@ namespace EmuDiscReader
             if (nonIsoPS3Game) { return "RPCS3"; } //No need to check ISO, return for ps3
 
             string emuName = "NONE";
-            CheckGameType CGT = new CheckGameType();
+            CheckGameType CGT = new();
             await Task.Run(() =>
             {
                 string fileEx = Path.GetExtension(gamePath).ToUpper();
@@ -155,10 +155,10 @@ namespace EmuDiscReader
             MainForm.ChangeDesc("Reading Disc");
             MainForm.MakeDiscImgRun();
 
-            if (AppService.CacheGame == true && !isRealPS2Game && !nonIsoPS3Game) //Wont cache real PS2 Discs or certain ps3 discs, only ISO (for now)
+            if ( AppService.PathEmu.WillCache == true && !isRealPS2Game && !nonIsoPS3Game) //Wont cache real PS2 Discs or certain ps3 discs, only ISO and single file formats (for now)
             {
                 Console.WriteLine("About to cache: Game Name: " + gameName + " game Path: " + gamePath);
-                Cache ca = new Cache();
+                Cache ca = new();
                 MainForm.ChangeDesc("Installing Game");
                 MainForm.CacheBarVis(true);
                 MainForm.InstallBarValue(0);
@@ -178,6 +178,10 @@ namespace EmuDiscReader
                 if (copy is null)
                 {
                     MainForm.DisplayError("Cache Error/Interupted!");
+                    await Task.Run(() =>
+                    {
+                        MainForm.EjectDiscDrive();
+                    });
                     return;
                 }
 

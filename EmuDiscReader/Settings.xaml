@@ -5,22 +5,32 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EmuDiscReader"
         mc:Ignorable="d"
-        Title="Settings" Height="800" Width="700">
-    <Grid Background="Black">
+        Title="Settings" Height="822" Width="961" MinWidth="543" MinHeight="800">
+    <Grid Background="#FF272727">
 
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Background="Black">
-            <TextBlock x:Name="Label" Text="Supported Emulators" FontSize="50" FontStyle="Italic" Foreground="White" Margin="0,0,0,20" FontWeight="Bold" HorizontalAlignment="Center" />
+        <Border
+            VerticalAlignment="Top"
+            Height="270"
+            Margin="105,37,105,0"
+            Background="#FF272727"
+            BorderBrush="White"
+            BorderThickness="2">
 
-            <TextBlock x:Name="Dolphin" Text="Dolphin Path:" FontStyle="Italic" Foreground="White" FontSize="22" Margin="10,0,0,0"/>
-            <TextBlock x:Name="Xemu" Text="Xemu Path:" FontStyle="Italic" Foreground="White" FontSize="22" Margin="10,0,0,0"/>
-            <TextBlock x:Name="PCSX2" Text="PCSX2 Path:" FontStyle="Italic" Foreground="White" FontSize="22" Margin="10,0,0,0"/>
-            <TextBlock x:Name="RPCS3" Text="RPCS3 Path:"  FontStyle="Italic" Foreground="White" FontSize="22" Margin="10,0,0,0"/>
-            <TextBlock x:Name="Cemu" Text="Cemu Path:"  FontStyle="Italic" Foreground="White" FontSize="22" Margin="10,0,0,0"/>
+            <StackPanel>
+                <TextBlock x:Name="Label" Text="Emulator Paths" FontSize="35" FontStyle="Italic" Foreground="White" Margin="0,0,0,20" FontWeight="Bold" HorizontalAlignment="Center" />
 
-            <Button x:Name="AddPath" Width="200" Height="35" HorizontalAlignment="Right" 
-            Background="White" FontSize="22" Content="Add Emulator Path" Margin="0,15,0,0" 
+                <TextBlock x:Name="Dolphin" Text="Dolphin Path:" FontStyle="Italic" Foreground="White" FontSize="22" Margin="10,0,0,0"/>
+                <TextBlock x:Name="Xemu" Text="Xemu Path:" FontStyle="Italic" Foreground="White" FontSize="22" Margin="10,0,0,0"/>
+                <TextBlock x:Name="PCSX2" Text="PCSX2 Path:" FontStyle="Italic" Foreground="White" FontSize="22" Margin="10,0,0,0"/>
+                <TextBlock x:Name="RPCS3" Text="RPCS3 Path:"  FontStyle="Italic" Foreground="White" FontSize="22" Margin="10,0,0,0"/>
+                <TextBlock x:Name="Cemu" Text="Cemu Path:"  FontStyle="Italic" Foreground="White" FontSize="22" Margin="10,0,0,0"/>
+
+                <Button x:Name="AddPath" Width="200" Height="35" HorizontalAlignment="Right" 
+            Background="White" FontSize="22" Content="Add..." Margin="0,5,10,0" 
             FontFamily="Yu Gothic UI" Cursor="Hand" VerticalAlignment="Bottom" Foreground="Black" BorderBrush="White" Click="AddPath_Click"/>
-        </StackPanel>
+            </StackPanel>
+        </Border>
 
+        
     </Grid>
 </Window>

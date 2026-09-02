@@ -59,7 +59,7 @@ namespace EmuDiscReader
                 string? appName = null;
                 string? path = null;
 
-                OpenFileDialog dialog = new OpenFileDialog()
+                OpenFileDialog dialog = new()
                 {
                     Title = "Choose capatible exe Emulator",
                     Filter = "Executable files (*.exe)|*.exe",
@@ -103,8 +103,7 @@ namespace EmuDiscReader
                     //Add other emulators
                 }
                 //Dont forget to write it back
-                string json = JsonSerializer.Serialize(AppService.PathEmu, AppJsonContext.Default.EmulationPaths);
-                File.WriteAllText(AppService.PathsFile.Path, json);
+                AppService.SaveJson();
             }
             catch (Exception ex)
             {

@@ -14,8 +14,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using Windows.Storage;
 using WpfAnimatedGif;
+using System.Runtime.InteropServices;
 
 namespace EmuDiscReader
 {
@@ -27,27 +29,38 @@ namespace EmuDiscReader
         public static class AppService
         {
             public static StorageFolder DocumentsFolder { get; } = KnownFolders.DocumentsLibrary;
-            public static StorageFile? PathsFile { get; set; }
+            public static StorageFile? PathsFile { get; set; }      //Path of where the json file is stored
             public static EmulationPaths? PathEmu { get; set; }
-            public static bool CacheGame { get; set; }
             public static bool InSettings { get; set; }
             public static TaskCompletionSource<bool> EmuLoaded { get; } = new();
+
+            public static void SaveJson()
+            {
+                if (PathEmu == null || PathsFile == null) { Console.WriteLine("PathEmu or PathsFile were NULL"); return; }
+                string json = JsonSerializer.Serialize(PathEmu, AppJsonContext.Default.EmulationPaths);
+                File.WriteAllText(PathsFile.Path, json);
+            }
             //add more if needed
         }
+        [DllImport("winmm.dll", EntryPoint = "mciSendStringA", CharSet = CharSet.Ansi)]
+        static extern int MciSendString(string command, StringBuilder? returnString, int returnLength, IntPtr callback);
         private const uint WM_DEVICECHANGE = 0x0219;
         private const int DBT_DEVICEARRIVAL = 0x8000;
         private const int DBT_DEVICEREMOVECOMPLETE = 0x8004;
         private ProcessDisc pd;
         public MainWindow()
         {
+            Console.WriteLine("To you 5000 years from now");
             InitializeComponent();
             SourceInitialized += MainWindow_SourceInitialized;
-            Console.WriteLine("To you 5000 years from now");
             LoadEmulatorJson();
-            AppService.CacheGame = false;
+            InitInstallBTN();
+
             pd = new ProcessDisc();
             pd.CheckDisc(this);
+
         }
+
         private void MainWindow_SourceInitialized(object? sender, EventArgs e)
         {
             HwndSource source = (HwndSource)PresentationSource.FromVisual(this)!;
@@ -57,25 +70,18 @@ namespace EmuDiscReader
         {
             if (msg == WM_DEVICECHANGE)
             {
-                switch (wParam.ToInt32())
+                if(wParam.ToInt32() == DBT_DEVICEARRIVAL)
                 {
-                    case DBT_DEVICEARRIVAL:
-                        pd.CheckDisc(this);
-                        break;
-
-                    case DBT_DEVICEREMOVECOMPLETE:
-                        DisplayError("Disc Tray Was Opened");
-                        break;
+                    pd.CheckDisc(this);
                 }
             }
-
             return IntPtr.Zero;
         }
 
 
         private static async void LoadEmulatorJson()
         {
-            Console.WriteLine("Init Emulator Paths");
+            //Console.WriteLine("Init Emulator Paths");
 
             AppService.PathsFile = await AppService.DocumentsFolder.CreateFileAsync
                 ("EmulatorPaths.json", CreationCollisionOption.OpenIfExists);
@@ -89,8 +95,10 @@ namespace EmuDiscReader
                 AppService.PathEmu = new EmulationPaths();
 
                 string newJson = JsonSerializer.Serialize(AppService.PathEmu, AppJsonContext.Default.EmulationPaths);
+                AppService.PathEmu.WillCache = false;
 
                 File.WriteAllText(AppService.PathsFile.Path, newJson);
+                Console.WriteLine(newJson);
             }
             //Read the content and load it into the class
             else
@@ -117,18 +125,18 @@ namespace EmuDiscReader
                 "pack://application:,,,/EmuDiscReader;component/Assets/readingDisc.gif")));
             });
         }
-        public void buttonVisble(bool swtich)
+        public void ButtonVisble(bool swtich)
         {
             Dispatcher.Invoke(() =>
             {
                 if (swtich)
-            {
+                {
                 SettingsBTN.IsEnabled = true;
-            }
-            else
-            {
+                }
+                else
+                {
                 SettingsBTN.IsEnabled = false;
-            }
+                }
             });
         }
         public void InstallBarValue(double value)
@@ -141,19 +149,19 @@ namespace EmuDiscReader
             Dispatcher.Invoke(() =>
             {
                 if (swtich)
-            {
+                {
                 InstallBar.Visibility = Visibility.Visible;
-            }
-            else
-            {
+                }
+                else
+                {
                 InstallBar.Visibility = Visibility.Collapsed;
-            }
+                }
             });
         }
 
         public async void DisplayError(string message = "Disc Error")
         {
-            buttonVisble(true);
+            ButtonVisble(true);
             ImageBehavior.SetAnimatedSource(Disc, new BitmapImage(new Uri(
                 "pack://application:,,,/EmuDiscReader;component/Assets/diskError.gif")));
             Description.Text = message;
@@ -167,12 +175,41 @@ namespace EmuDiscReader
         private void SettingsBTN_Click(object sender, RoutedEventArgs e)
         {
             AppService.InSettings = true;
-            Settings setWin = new Settings();
+            Settings setWin = new();
             setWin.Owner = this;
             setWin.ShowDialog();
             AppService.InSettings = false;
             pd.CheckDisc(this);
         }
+        private async void InitInstallBTN()
+        {
+            await AppService.EmuLoaded.Task;
+            if (AppService.PathEmu is null) { return; }
+            InstallBTN.IsChecked = AppService.PathEmu.WillCache;
+        }
+
+        private async void InstallBTN_Checked(object sender, RoutedEventArgs e)
+        {
+            await AppService.EmuLoaded.Task;
+            if (AppService.PathEmu is null){ return; }
+
+            AppService.PathEmu.WillCache = true;
+            AppService.SaveJson();
+        }
+        private async void InstallBTN_Unchecked(object sender, RoutedEventArgs e)
+        {
+            await AppService.EmuLoaded.Task;
+            if (AppService.PathEmu is null) { return; }
+
+            AppService.PathEmu.WillCache = false;
+            AppService.SaveJson();
+        }
+        public void EjectDiscDrive()
+        {
+
+            MciSendString("set cdaudio door open", null, 0, IntPtr.Zero);
+        }
+
     }
 
     [JsonSourceGenerationOptions(WriteIndented = false)]

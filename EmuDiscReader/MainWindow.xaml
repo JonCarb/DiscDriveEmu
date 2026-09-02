@@ -11,7 +11,6 @@
         AllowsTransparency="True"
         Background="#1E1E1E"
         Title="Disc Reader" Height="1080" Width="1920">
-    
 
     <Grid>
         <Grid.Background>
@@ -23,15 +22,67 @@
         </Grid.Background>
 
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Image x:Name ="Disc" gif:ImageBehavior.AnimatedSource="/EmuDiscReader;component/Assets/spinningDisc.gif" Width="800" Height="800"/>
-            <TextBlock x:Name="Description" Text="Please insert a Disc" FontSize="50" HorizontalAlignment="Center" FontStyle="Italic" Foreground="White" Margin="0,0,0,10"/>
-            <ProgressBar x:Name="InstallBar" Minimum="0" Maximum="100" Value="0" Width="800" Height="23" Visibility ="Collapsed"/>
+            <Image 
+                x:Name ="Disc" 
+                gif:ImageBehavior.AnimatedSource="/EmuDiscReader;component/Assets/spinningDisc.gif" 
+                Width="800" 
+                Height="800"/>
+            <TextBlock 
+                x:Name="Description" 
+                Text="Please insert a Disc" 
+                FontSize="50" 
+                HorizontalAlignment="Center" 
+                FontStyle="Italic" 
+                Foreground="White" 
+                Margin="0,0,0,10"/>
+            <ProgressBar 
+                x:Name="InstallBar" 
+                Minimum="0" 
+                Maximum="100" 
+                Value="0" 
+                Width="800" 
+                Height="23" 
+                Visibility ="Collapsed"/>
         </StackPanel>
+
         <Image Source="/EmuDiscReader;component/Assets/scanline.png" Stretch="Fill"/>
 
-        <Button x:Name="SettingsBTN" Width="197" Height="40" HorizontalAlignment="Right"
-            Background="White" FontSize="18" Content="⚙️ Settings" Margin="0,0,20,20" 
-            FontFamily="Yu Gothic UI" Cursor="Hand" VerticalAlignment="Bottom" Foreground="Black" BorderBrush="Black" Click="SettingsBTN_Click"/>
+        <Button 
+            x:Name="SettingsBTN" 
+            Width="197" 
+            Height="40" 
+            HorizontalAlignment="Right"
+            Background="White" 
+            FontSize="18" 
+            Content="⚙️ Settings" 
+            Margin="0,0,20,20" 
+            FontFamily="Yu Gothic UI" 
+            Cursor="Hand" 
+            VerticalAlignment="Bottom" 
+            Foreground="Black" 
+            BorderBrush="Black" 
+            Click="SettingsBTN_Click"/>
+
+        <Border 
+            BorderBrush="#FF9D9AFF"
+            BorderThickness="2"
+            CornerRadius="5"
+            Width="197"
+            Height="40"
+            Margin="20,0,0,20"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Left">
+            <CheckBox 
+                x:Name="InstallBTN"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                FontSize="18"
+                Content="⬇️ Install Game"
+                FontFamily="Yu Gothic UI"
+                Cursor="Hand"
+                Foreground="White"
+                HorizontalAlignment="Center" Checked="InstallBTN_Checked" Unchecked ="InstallBTN_Unchecked"/>
+        </Border>
 
     </Grid>
 </Window>

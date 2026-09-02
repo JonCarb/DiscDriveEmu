@@ -14,6 +14,7 @@ namespace EmuDiscReader
     {
         public async Task<StorageFile?> CacheGame(string gameName, string gamePath, IProgress<double>? progress = null)
         {
+            if(AppService.PathEmu == null) { return null; }
             try
             {
                 StorageFolder destination;
@@ -46,7 +47,7 @@ namespace EmuDiscReader
 
                 if (File.Exists(destinationPath))
                 {
-                    FileInfo cachedFile = new FileInfo(destinationPath);
+                    FileInfo cachedFile = new(destinationPath);
 
                     if ((ulong)cachedFile.Length == totalBytes)
                     {
@@ -61,14 +62,14 @@ namespace EmuDiscReader
                 const int bufferSize = 8 * 1024 * 1024; //8mb buffer
                 byte[] buffer = new byte[bufferSize];
 
-                using (FileStream input = new FileStream(
+                using (FileStream input = new(
                     gamePath,
                     FileMode.Open,
                     FileAccess.Read,
                     FileShare.Read,
                     bufferSize,
                     FileOptions.SequentialScan | FileOptions.Asynchronous))
-                using (FileStream output = new FileStream(
+                using (FileStream output = new(
                     destinationPath,
                     FileMode.Create,
                     FileAccess.Write,
@@ -82,48 +83,31 @@ namespace EmuDiscReader
 
                     while (true)
                     {
-
-                        var sw = Stopwatch.StartNew();
-
-                        Console.WriteLine(
-                            $"BEFORE READ | Position: {input.Position:N0}/{totalBytes:N0}");
+                        if(AppService.PathEmu.WillCache == false) { break; }
 
                         bytesRead = await input.ReadAsync(buffer, 0, buffer.Length);
 
-                        sw.Stop();
+                        if (bytesRead <= 0) { break; }
 
-                        Console.WriteLine(
-                            $"AFTER READ | {bytesRead:N0} bytes | " +
-                            $"READ TIME: {sw.Elapsed.TotalSeconds:F2}s");
-
-                        if (bytesRead <= 0)
-                            break;
-
-                        await output.WriteAsync(
-                            buffer, 0, bytesRead);
-
-                        Console.WriteLine(
-                            $"WRITE | {bytesRead:N0} bytes");
+                        await output.WriteAsync(buffer, 0, bytesRead);
 
                         copiedBytes += bytesRead;
 
-                        double percentage =
-                            (double)copiedBytes / totalBytes * 100.0;
+                        double percentage = (double)copiedBytes / totalBytes * 100.0;
 
-                        if (percentage - lastReportedPercentage >= 1.0 ||
-                            percentage >= 100.0)
+                        if (percentage - lastReportedPercentage >= 1.0 || percentage >= 100.0)
                         {
                             lastReportedPercentage = percentage;
-
-                            Console.WriteLine(
-                                $"PROGRESS: {percentage:F1}%");
-
+                            Console.WriteLine($"PROGRESS: {percentage:F1}%");
                             progress?.Report(percentage);
                         }
                     }
                 }
 
-                return await StorageFile.GetFileFromPathAsync(destinationPath);
+                if(AppService.PathEmu.WillCache == false) { return null; }
+
+                return await StorageFile.GetFileFromPathAsync(destinationPath); 
+
             }
             catch (UnauthorizedAccessException ex)
             {
