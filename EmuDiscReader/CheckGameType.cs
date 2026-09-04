@@ -112,10 +112,10 @@ namespace EmuDiscReader
 
         public bool ReadGCWIINonIso(string fileExtension)
         {
-            if (fileExtension == ".RVZ" ||
+            if (fileExtension == ".RVZ"  ||
                 fileExtension == ".WBFS" ||
-                fileExtension == ".WIA" ||
-                fileExtension == ".GCZ" ||
+                fileExtension == ".WIA"  ||
+                fileExtension == ".GCZ"  ||
                 fileExtension == ".CISO" ||
                 fileExtension == ".WAD")
             {

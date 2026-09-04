@@ -15,29 +15,29 @@ namespace EmuDiscReader
         private string gamePath = "NULL";   //Holds the absolute path to run with (potential) emulator
         private string gameName = "NULL";   //Only holds the game file name
         private string discDrive = "NULL";  //Holds the Root Path of the disc drive since its diff for every computer
+        private string emulator = "NULL";
         private string discArg = " ";       //Only used for ps2 cmd args
         private bool isRealPS2Game = false;
         private bool nonIsoPS3Game = false;
+        private bool discChecked = false;
 
         private MainWindow? MainForm;
-        public async void CheckDisc(MainWindow f)
+        public async Task CheckDisc(MainWindow f)
         {
             if (AppService.InSettings) { return; }
             this.MainForm = f;
 
             await AppService.EmuLoaded.Task;
 
-            await Task.Run(() =>
+            bool driveExists = await Task.Run(() =>
             {
                 discDrive = DriveInfo.GetDrives().FirstOrDefault(d => d.DriveType == DriveType.CDRom)?.Name ?? "NULL";
+                return discDrive != "NULL" && Directory.Exists(discDrive);
             });
-            //Check to see if disc is already in, otherwise wait for event
-            if ((discDrive != "NULL") && (Directory.Exists(discDrive) == true))
-            {
-                RunDisc();
-            }
+
+            if (driveExists) { await RunDisc(); }
         }
-        private async void RunDisc()
+        private async Task RunDisc()
         {
             if (MainForm == null) { Console.WriteLine("Form is null"); return; }
 
@@ -53,19 +53,20 @@ namespace EmuDiscReader
 
             if (!ready)
             {
-                MainForm.DisplayError("Drive not ready");
+                await MainForm.DisplayError("Drive not ready");
                 return;
             }
 
             if (await GetGamePath())
             {
                 Console.WriteLine(gamePath);
-                string emu = await ChooseEmulator();
-                RunGame(emu);
+                emulator = await ChooseEmulator();
+                discChecked = true;
+                await ReadyGame();
             }
             else
             {
-                MainForm.DisplayError("Couldnt get game path");
+                await MainForm.DisplayError("Couldnt get game path");
             }
         }
 
@@ -84,14 +85,30 @@ namespace EmuDiscReader
         }
         private async Task<bool> GetGamePath()
         {
+            //Reset values in case disc get swapped
+            isRealPS2Game = false;
+            nonIsoPS3Game = false;
+            discChecked = false;
+            gamePath = "NULL";
+            gameName = "NULL";
+            discArg = " ";
+            emulator = "NULL";
+
             if (MainForm == null) { Console.WriteLine("Form is null"); return false; }
             string? fileName = null;
 
             await Task.Run(() =>
             {
                 fileName = Directory.EnumerateFiles(discDrive).FirstOrDefault();
-                if (File.Exists(Path.Combine(discDrive, "SYSTEM.CNF"))) { isRealPS2Game = true; }   //Disc has ps2 game files
-                if (File.Exists(Path.Combine(discDrive, "PS3_DISC.SFB"))) { nonIsoPS3Game = true; } //Disc has ps3 unpackaged game files
+                if (File.Exists(Path.Combine(discDrive, "SYSTEM.CNF"))) 
+                { 
+                    isRealPS2Game = true; //Disc has ps2 game files
+                }  
+                if (File.Exists(Path.Combine(discDrive, "PS3_DISC.SFB")) 
+                    && Directory.Exists(Path.Combine(discDrive, "PS3_GAME")))
+                {
+                    nonIsoPS3Game = true; //Disc has ps3 unpackaged game files
+                }
             });
 
             if (isRealPS2Game)
@@ -102,7 +119,7 @@ namespace EmuDiscReader
             }
             if (nonIsoPS3Game)
             {
-                gamePath = discDrive + "PS3_GAME";
+                gamePath = Path.Combine(discDrive, "PS3_GAME");
                 Console.WriteLine(gamePath);
                 return true;
             }
@@ -119,7 +136,7 @@ namespace EmuDiscReader
 
         private async Task<string> ChooseEmulator()
         {
-            Debug.WriteLine("Choose EMU Called");
+            Console.WriteLine("Choose EMU Called");
 
             if (isRealPS2Game) { return "PCSX2"; } //IF its a real ps2 disc, just return ps2
             if (nonIsoPS3Game) { return "RPCS3"; } //No need to check ISO, return for ps3
@@ -147,15 +164,28 @@ namespace EmuDiscReader
 
             return emuName;
         }
-        private async void RunGame(string emulator)
+        public async Task ReadyGame()
         {
+            Console.WriteLine("Skbidi ReadyGame called!");
             if (MainForm == null) { Console.WriteLine("Form is null"); return; }
-            if (AppService.PathEmu == null) { MainForm.DisplayError("Path Class is NULL!"); return; }
+            if (AppService.PathEmu == null) { await MainForm.DisplayError("Path Class is NULL!"); return; }
+
+            if (!discChecked)
+            {
+                Console.WriteLine("No disc has been checked yet.");
+                return;
+            }
+            if (emulator == "NULL" || emulator == "NONE")
+            {
+                await MainForm.DisplayError("Unknown/Unsupported Disc");
+                return;
+            }
 
             MainForm.ChangeDesc("Reading Disc");
             MainForm.MakeDiscImgRun();
 
-            if ( AppService.PathEmu.WillCache == true && !isRealPS2Game && !nonIsoPS3Game) //Wont cache real PS2 Discs or certain ps3 discs, only ISO and single file formats (for now)
+            //Wont cache real PS2 Discs or certain ps3 discs, only ISO and single file formats (for now)
+            if ( AppService.PathEmu.WillCache == true && !isRealPS2Game && !nonIsoPS3Game) 
             {
                 Console.WriteLine("About to cache: Game Name: " + gameName + " game Path: " + gamePath);
                 Cache ca = new();
@@ -177,43 +207,46 @@ namespace EmuDiscReader
 
                 if (copy is null)
                 {
-                    MainForm.DisplayError("Cache Error/Interupted!");
-                    await Task.Run(() =>
-                    {
-                        MainForm.EjectDiscDrive();
-                    });
+                    await MainForm.DisplayError("Cache Error/Interupted!");
                     return;
                 }
 
                 gamePath = copy.Path;
             }
 
-            await Task.Delay(500); //Force people into seeing my cool animation
+            AppService.GameReady = true;
+            MainForm.ChangeDesc("Press A to Start!");
+        }
+        public async void PlayGame()
+        {
+            if (MainForm == null) { Console.WriteLine("Form is null"); return; }
+            if (AppService.PathEmu == null) { await MainForm.DisplayError("Path Class is NULL!"); return; }
+            if(AppService.GameReady == false) { await MainForm.DisplayError("Disc not ready!"); return; }
 
             switch (emulator)
             {
                 case "DOLPHIN":
-                    if (File.Exists(AppService.PathEmu.Dolphin) == false) { MainForm.DisplayError("NO DOLPHIN (GC/WII) PATH"); return; }
+                    if (File.Exists(AppService.PathEmu.Dolphin) == false) { await MainForm.DisplayError("NO DOLPHIN (GC/WII) PATH"); return; }
                     System.Diagnostics.Process.Start(AppService.PathEmu.Dolphin, "-b " + "-e " + "\"" + gamePath + "\"");
                     break;
                 case "PCSX2":
-                    if (File.Exists(AppService.PathEmu.PCSX2) == false) { MainForm.DisplayError("NO PCSX2 (PS2) PATH"); return; }
+                    if (File.Exists(AppService.PathEmu.PCSX2) == false) { await MainForm.DisplayError("NO PCSX2 (PS2) PATH"); return; }
                     System.Diagnostics.Process.Start(AppService.PathEmu.PCSX2, " -fullscreen " + discArg + "\"" + gamePath + "\"");
                     break;
                 case "XEMU":
-                    if (File.Exists(AppService.PathEmu.Xemu) == false) { MainForm.DisplayError("NO XEMU (XBOX) PATH"); return; }
+                    if (File.Exists(AppService.PathEmu.Xemu) == false) { await MainForm.DisplayError("NO XEMU (XBOX) PATH"); return; }
                     System.Diagnostics.Process.Start(AppService.PathEmu.Xemu, " -full-screen " + " -dvd_path " + "\"" + gamePath + "\"");
                     break;
                 case "CEMU":
-                    if (File.Exists(AppService.PathEmu.Cemu) == false) { MainForm.DisplayError("NO CEMU (WII U) PATH"); return; }
+                    if (File.Exists(AppService.PathEmu.Cemu) == false) { await MainForm.DisplayError("NO CEMU (WII U) PATH"); return; }
                     System.Diagnostics.Process.Start(AppService.PathEmu.Cemu, " -g " + "\"" + gamePath + "\"" + " -f");
                     break;
                 case "RPCS3":
-                    if (File.Exists(AppService.PathEmu.RPCS3) == false) { MainForm.DisplayError("NO RPCS3 (PS3) PATH"); return; }
+                    if (File.Exists(AppService.PathEmu.RPCS3) == false) { await MainForm.DisplayError("NO RPCS3 (PS3) PATH"); return; }
                     System.Diagnostics.Process.Start(AppService.PathEmu.RPCS3, " " + "\"" + gamePath + "\"");
                     break;
                 default:
-                    MainForm.DisplayError("Unknown/Unsupported Disc"); return;
+                    await MainForm.DisplayError("Unknown/Unsupported Disc"); return;
             }
             MainForm.ChangeDesc("Starting Game");
             await Task.Delay(2000);

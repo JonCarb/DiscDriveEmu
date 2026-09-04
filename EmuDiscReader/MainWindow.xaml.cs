@@ -32,6 +32,7 @@ namespace EmuDiscReader
             public static StorageFile? PathsFile { get; set; }      //Path of where the json file is stored
             public static EmulationPaths? PathEmu { get; set; }
             public static bool InSettings { get; set; }
+            public static bool GameReady { get; set; }
             public static TaskCompletionSource<bool> EmuLoaded { get; } = new();
 
             public static void SaveJson()
@@ -42,22 +43,27 @@ namespace EmuDiscReader
             }
             //add more if needed
         }
+
         [DllImport("winmm.dll", EntryPoint = "mciSendStringA", CharSet = CharSet.Ansi)]
         static extern int MciSendString(string command, StringBuilder? returnString, int returnLength, IntPtr callback);
         private const uint WM_DEVICECHANGE = 0x0219;
         private const int DBT_DEVICEARRIVAL = 0x8000;
         private const int DBT_DEVICEREMOVECOMPLETE = 0x8004;
         private ProcessDisc pd;
+        private bool initInstall = true;
         public MainWindow()
         {
             Console.WriteLine("To you 5000 years from now");
             InitializeComponent();
-            SourceInitialized += MainWindow_SourceInitialized;
-            LoadEmulatorJson();
-            InitInstallBTN();
-
             pd = new ProcessDisc();
-            pd.CheckDisc(this);
+
+            SourceInitialized += MainWindow_SourceInitialized;
+            _ = LoadEmulatorJson();
+            _ = InitInstallBTN();
+
+            AppService.GameReady = false;
+
+            _ = pd.CheckDisc(this);
 
         }
 
@@ -72,14 +78,14 @@ namespace EmuDiscReader
             {
                 if(wParam.ToInt32() == DBT_DEVICEARRIVAL)
                 {
-                    pd.CheckDisc(this);
+                    _ = pd.CheckDisc(this);
                 }
             }
             return IntPtr.Zero;
         }
 
 
-        private static async void LoadEmulatorJson()
+        private static async Task LoadEmulatorJson()
         {
             //Console.WriteLine("Init Emulator Paths");
 
@@ -92,10 +98,10 @@ namespace EmuDiscReader
             //Fill file if its empty
             if (string.IsNullOrWhiteSpace(readJson))
             {
-                AppService.PathEmu = new EmulationPaths();
-
-                string newJson = JsonSerializer.Serialize(AppService.PathEmu, AppJsonContext.Default.EmulationPaths);
+                AppService.PathEmu = new();
                 AppService.PathEmu.WillCache = false;
+
+                string newJson = JsonSerializer.Serialize(AppService.PathEmu,AppJsonContext.Default.EmulationPaths);
 
                 File.WriteAllText(AppService.PathsFile.Path, newJson);
                 Console.WriteLine(newJson);
@@ -108,7 +114,9 @@ namespace EmuDiscReader
             AppService.EmuLoaded.SetResult(true);
         }
         /*
+        /
          HANDLE DISPLAY
+        /
         */
         public void ChangeDesc(string message)
         {
@@ -159,18 +167,32 @@ namespace EmuDiscReader
             });
         }
 
-        public async void DisplayError(string message = "Disc Error")
+        public async Task DisplayError(string message = "Disc Error")
         {
+
             ButtonVisble(true);
+            AppService.GameReady = false;
             ImageBehavior.SetAnimatedSource(Disc, new BitmapImage(new Uri(
                 "pack://application:,,,/EmuDiscReader;component/Assets/diskError.gif")));
             Description.Text = message;
 
+            await Task.Run(() =>
+            {
+                MciSendString("set cdaudio door open", null, 0, IntPtr.Zero);   //Eject Disc
+            });
+
             await Task.Delay(3220);
+
             ImageBehavior.SetAnimatedSource(Disc, new BitmapImage(new Uri(
                 "pack://application:,,,/EmuDiscReader;component/Assets/spinningDisc.gif")));
             Description.Text = "Please insert a Disc";
         }
+
+        /*
+        /
+        /
+        /
+        */
 
         private void SettingsBTN_Click(object sender, RoutedEventArgs e)
         {
@@ -179,37 +201,39 @@ namespace EmuDiscReader
             setWin.Owner = this;
             setWin.ShowDialog();
             AppService.InSettings = false;
-            pd.CheckDisc(this);
+            _ = pd.CheckDisc(this);
         }
-        private async void InitInstallBTN()
+
+        private async Task InitInstallBTN()
         {
             await AppService.EmuLoaded.Task;
             if (AppService.PathEmu is null) { return; }
             InstallBTN.IsChecked = AppService.PathEmu.WillCache;
+            initInstall = false;
         }
 
         private async void InstallBTN_Checked(object sender, RoutedEventArgs e)
         {
+            if(initInstall) { return; }
             await AppService.EmuLoaded.Task;
             if (AppService.PathEmu is null){ return; }
-
             AppService.PathEmu.WillCache = true;
             AppService.SaveJson();
+            await pd.ReadyGame();
         }
         private async void InstallBTN_Unchecked(object sender, RoutedEventArgs e)
         {
+            if (initInstall) { return; }
             await AppService.EmuLoaded.Task;
             if (AppService.PathEmu is null) { return; }
-
             AppService.PathEmu.WillCache = false;
             AppService.SaveJson();
         }
-        public void EjectDiscDrive()
+
+        private void Play_Click(object sender, RoutedEventArgs e)
         {
-
-            MciSendString("set cdaudio door open", null, 0, IntPtr.Zero);
+            pd.PlayGame();
         }
-
     }
 
     [JsonSourceGenerationOptions(WriteIndented = false)]

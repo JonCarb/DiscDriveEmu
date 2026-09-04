@@ -14,7 +14,6 @@ namespace EmuDiscReader
         public string? Xemu { get; set; }
         public string? Cemu { get; set; }
         public string? RPCS3 { get; set; }
-
         public bool WillCache { get; set; }
 
         //Maybe potentially add more values like cmd parameters, specific folder for caching, etc

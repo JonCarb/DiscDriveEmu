@@ -41,12 +41,27 @@
                 Maximum="100" 
                 Value="0" 
                 Width="800" 
-                Height="23" 
+                Height="23" Margin="0,0,0,10" 
                 Visibility ="Collapsed"/>
         </StackPanel>
 
         <Image Source="/EmuDiscReader;component/Assets/scanline.png" Stretch="Fill"/>
 
+        <Button
+            x:Name = "Play"
+            Width="197" 
+            Height="40" 
+            Background="White" 
+            FontSize="18" 
+            Content="Play Game" 
+            Margin="0,0,0,50" 
+            FontFamily="Yu Gothic UI" 
+            Cursor="Hand" 
+            VerticalAlignment="Bottom" 
+            Foreground="Black" 
+            BorderBrush="Black" 
+            Click="Play_Click" />
+        
         <Button 
             x:Name="SettingsBTN" 
             Width="197" 
@@ -81,7 +96,9 @@
                 FontFamily="Yu Gothic UI"
                 Cursor="Hand"
                 Foreground="White"
-                HorizontalAlignment="Center" Checked="InstallBTN_Checked" Unchecked ="InstallBTN_Unchecked"/>
+                HorizontalAlignment="Center" 
+                Checked="InstallBTN_Checked" 
+                Unchecked ="InstallBTN_Unchecked"/>
         </Border>
 
     </Grid>
