@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using Windows.Storage;
 using static EmuDiscReader.MainWindow;
 
@@ -20,7 +21,7 @@ namespace EmuDiscReader
         private bool isRealPS2Game = false;
         private bool nonIsoPS3Game = false;
         private bool discChecked = false;
-
+        private bool isBusy = false;
         private MainWindow? MainForm;
         public async Task CheckDisc(MainWindow f)
         {
@@ -36,6 +37,16 @@ namespace EmuDiscReader
             });
 
             if (driveExists) { await RunDisc(); }
+        }
+        private void ResetValues()
+        {
+            isRealPS2Game = false;
+            nonIsoPS3Game = false;
+            discChecked = false;
+            gamePath = "NULL";
+            gameName = "NULL";
+            discArg = " ";
+            emulator = "NULL";
         }
         private async Task RunDisc()
         {
@@ -86,13 +97,7 @@ namespace EmuDiscReader
         private async Task<bool> GetGamePath()
         {
             //Reset values in case disc get swapped
-            isRealPS2Game = false;
-            nonIsoPS3Game = false;
-            discChecked = false;
-            gamePath = "NULL";
-            gameName = "NULL";
-            discArg = " ";
-            emulator = "NULL";
+            ResetValues();
 
             if (MainForm == null) { Console.WriteLine("Form is null"); return false; }
             string? fileName = null;
@@ -166,7 +171,6 @@ namespace EmuDiscReader
         }
         public async Task ReadyGame()
         {
-            Console.WriteLine("Skbidi ReadyGame called!");
             if (MainForm == null) { Console.WriteLine("Form is null"); return; }
             if (AppService.PathEmu == null) { await MainForm.DisplayError("Path Class is NULL!"); return; }
 
@@ -182,19 +186,20 @@ namespace EmuDiscReader
             }
 
             MainForm.ChangeDesc("Reading Disc");
-            MainForm.MakeDiscImgRun();
+            MainForm.MakeDiscImgRun(); 
 
-            //Wont cache real PS2 Discs or certain ps3 discs, only ISO and single file formats (for now)
+            //Wont cache real PS2 Discs or certain ps3 formats, only ISO and single file formats
             if ( AppService.PathEmu.WillCache == true && !isRealPS2Game && !nonIsoPS3Game) 
             {
-                Console.WriteLine("About to cache: Game Name: " + gameName + " game Path: " + gamePath);
+                Console.WriteLine($"About to cache: Game Name: {gameName} game Path: {gamePath}");
                 Cache ca = new();
                 MainForm.ChangeDesc("Installing Game");
                 MainForm.CacheBarVis(true);
-                MainForm.InstallBarValue(0);
+                MainForm.InstallBar.Value = 0;
+                MainForm.InstallBTN.Content = "Cancel Install";
                 var progress = new Progress<double>(percentage =>
                 {
-                    MainForm.InstallBarValue(percentage);
+                    MainForm.InstallBar.Value = percentage;
                     MainForm.ChangeDesc($"Installing Game {percentage:F0}%");
                 });
 
@@ -204,10 +209,13 @@ namespace EmuDiscReader
                 });
 
                 MainForm.CacheBarVis(false);
+                MainForm.InstallBTN.Content = "⬇️ Install Game";
 
                 if (copy is null)
                 {
+                    ResetValues(); //Disc tray gets opened so reset values to not allow broken installs
                     await MainForm.DisplayError("Cache Error/Interupted!");
+                    MainForm.ButtonVisble(true);
                     return;
                 }
 
@@ -215,14 +223,19 @@ namespace EmuDiscReader
             }
 
             AppService.GameReady = true;
-            MainForm.ChangeDesc("Press A to Start!");
+            MainForm.DescPrefix.Text = " Press";
+            MainForm.DescIconA.Visibility = Visibility.Visible;
+            MainForm.DescSuffix.Text = "to Start";
+            MainForm.ButtonVisble(true);
         }
         public async void PlayGame()
         {
             if (MainForm == null) { Console.WriteLine("Form is null"); return; }
             if (AppService.PathEmu == null) { await MainForm.DisplayError("Path Class is NULL!"); return; }
-            if(AppService.GameReady == false) { await MainForm.DisplayError("Disc not ready!"); return; }
+            if(AppService.GameReady == false) { Console.WriteLine("Disc not ready!"); return; }
+            if(isBusy) { return; }
 
+            isBusy = true;
             switch (emulator)
             {
                 case "DOLPHIN":
@@ -246,6 +259,7 @@ namespace EmuDiscReader
                     System.Diagnostics.Process.Start(AppService.PathEmu.RPCS3, " " + "\"" + gamePath + "\"");
                     break;
                 default:
+                    isBusy = false;
                     await MainForm.DisplayError("Unknown/Unsupported Disc"); return;
             }
             MainForm.ChangeDesc("Starting Game");

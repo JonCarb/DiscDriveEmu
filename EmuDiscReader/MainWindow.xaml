@@ -21,20 +21,34 @@
             </LinearGradientBrush>
         </Grid.Background>
 
+
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
             <Image 
                 x:Name ="Disc" 
                 gif:ImageBehavior.AnimatedSource="/EmuDiscReader;component/Assets/spinningDisc.gif" 
                 Width="800" 
-                Height="800"/>
+                Height="800"
+                Panel.ZIndex= "-1"/>
+
             <TextBlock 
                 x:Name="Description" 
-                Text="Please insert a Disc" 
                 FontSize="50" 
                 HorizontalAlignment="Center" 
                 FontStyle="Italic" 
                 Foreground="White" 
-                Margin="0,0,0,10"/>
+                Margin="0,0,0,10">
+                <Run x:Name="DescPrefix" Text=" Please insert a Disc" FontSize="60"/>
+                <InlineUIContainer BaselineAlignment="Center">
+                    <Image 
+                        x:Name="DescIconA"
+                        Source="/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-A.png" 
+                        Height="79" 
+                        Width="75" 
+                        Margin="0,10,0,0"
+                        Visibility="Collapsed"/>
+                </InlineUIContainer>
+                <Run x:Name="DescSuffix" Text="" FontSize="60"/>
+            </TextBlock>
             <ProgressBar 
                 x:Name="InstallBar" 
                 Minimum="0" 
@@ -47,36 +61,28 @@
 
         <Image Source="/EmuDiscReader;component/Assets/scanline.png" Stretch="Fill"/>
 
-        <Button
-            x:Name = "Play"
-            Width="197" 
-            Height="40" 
-            Background="White" 
-            FontSize="18" 
-            Content="Play Game" 
-            Margin="0,0,0,50" 
-            FontFamily="Yu Gothic UI" 
-            Cursor="Hand" 
-            VerticalAlignment="Bottom" 
-            Foreground="Black" 
-            BorderBrush="Black" 
-            Click="Play_Click" />
-        
-        <Button 
-            x:Name="SettingsBTN" 
-            Width="197" 
-            Height="40" 
+        <Grid 
+            Margin="0,0,70,20" 
             HorizontalAlignment="Right"
-            Background="White" 
-            FontSize="18" 
-            Content="⚙️ Settings" 
-            Margin="0,0,20,20" 
-            FontFamily="Yu Gothic UI" 
-            Cursor="Hand" 
-            VerticalAlignment="Bottom" 
-            Foreground="Black" 
-            BorderBrush="Black" 
-            Click="SettingsBTN_Click"/>
+            VerticalAlignment="Bottom"
+            Width="197"
+            Height="40">
+
+            <Button 
+                x:Name="SettingsBTN" 
+                Background="White" 
+                FontSize="18" 
+                Content="⚙️ Settings" 
+                FontFamily="Yu Gothic UI" 
+                Cursor="Hand" 
+                Foreground="Black" 
+                BorderBrush="Black" 
+                Click="SettingsBTN_Click"/>
+
+            <Image 
+                Source="/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-B.png"
+                Margin="195,-6,-58,-6"/>
+        </Grid>
 
         <Border 
             BorderBrush="#FF9D9AFF"
@@ -84,21 +90,28 @@
             CornerRadius="5"
             Width="197"
             Height="40"
-            Margin="20,0,0,20"
+            Margin="70,0,0,20"
             VerticalAlignment="Bottom"
             HorizontalAlignment="Left">
-            <CheckBox 
-                x:Name="InstallBTN"
-                HorizontalContentAlignment="Center"
-                VerticalContentAlignment="Center"
-                FontSize="18"
-                Content="⬇️ Install Game"
-                FontFamily="Yu Gothic UI"
-                Cursor="Hand"
-                Foreground="White"
-                HorizontalAlignment="Center" 
-                Checked="InstallBTN_Checked" 
-                Unchecked ="InstallBTN_Unchecked"/>
+
+            <Grid>
+                <CheckBox 
+                    x:Name="InstallBTN"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    FontSize="18"
+                    Content="⬇️ Install Game"
+                    FontFamily="Yu Gothic UI"
+                    Cursor="Hand"
+                    Foreground="White"
+                    HorizontalAlignment="Center" 
+                    Checked="InstallBTN_Checked" 
+                    Unchecked="InstallBTN_Unchecked" />
+
+                <Image 
+                    Source="/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-X.png" 
+                    Margin="-58,-6,195,-6"/>
+            </Grid>
         </Border>
 
     </Grid>

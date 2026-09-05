@@ -9,6 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\ButtonIcon-Xbox360-A.png" />
+    <None Remove="Assets\ButtonIcon-Xbox360-B.png" />
+    <None Remove="Assets\ButtonIcon-Xbox360-X.png" />
     <None Remove="Assets\diskError.gif" />
     <None Remove="Assets\readingDisc.gif" />
     <None Remove="Assets\scanline.png" />
@@ -18,10 +21,21 @@
   <ItemGroup>
     <PackageReference Include="LTRData.DiscUtils.Iso9660" Version="1.0.88" />
     <PackageReference Include="LTRData.DiscUtils.Udf" Version="1.0.88" />
+    <PackageReference Include="SDL3-CS" Version="3.4.16" />
+    <PackageReference Include="SDL3-CS.Windows" Version="3.4.16" />
     <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\ButtonIcon-Xbox360-A.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\ButtonIcon-Xbox360-B.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\ButtonIcon-Xbox360-X.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Assets\diskError.gif">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>

@@ -30,7 +30,7 @@ namespace EmuDiscReader
             LoadPaths();
         }
 
-        private async void LoadPaths()
+        private void LoadPaths()
         {
             if (AppService.PathEmu == null)
             {

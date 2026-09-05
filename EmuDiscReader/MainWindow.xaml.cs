@@ -1,6 +1,8 @@
 ﻿using DiscUtils.Raw;
+using SDL3;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -17,7 +19,6 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using Windows.Storage;
 using WpfAnimatedGif;
-using System.Runtime.InteropServices;
 
 namespace EmuDiscReader
 {
@@ -49,13 +50,16 @@ namespace EmuDiscReader
         private const uint WM_DEVICECHANGE = 0x0219;
         private const int DBT_DEVICEARRIVAL = 0x8000;
         private const int DBT_DEVICEREMOVECOMPLETE = 0x8004;
-        private ProcessDisc pd;
         private bool initInstall = true;
+        private ProcessDisc pd;
+        private SDLController sdlCont;
+
         public MainWindow()
         {
             Console.WriteLine("To you 5000 years from now");
             InitializeComponent();
             pd = new ProcessDisc();
+            sdlCont = new();
 
             SourceInitialized += MainWindow_SourceInitialized;
             _ = LoadEmulatorJson();
@@ -63,6 +67,7 @@ namespace EmuDiscReader
 
             AppService.GameReady = false;
 
+            sdlCont.InitSDL(this);
             _ = pd.CheckDisc(this);
 
         }
@@ -122,7 +127,9 @@ namespace EmuDiscReader
         {
             Dispatcher.Invoke(() =>
             {
-                Description.Text = message;
+                DescPrefix.Text = message;
+                DescIconA.Visibility = Visibility.Collapsed;
+                DescSuffix.Text = "";
             });
         }
         public void MakeDiscImgRun()
@@ -140,16 +147,13 @@ namespace EmuDiscReader
                 if (swtich)
                 {
                 SettingsBTN.IsEnabled = true;
+                
                 }
                 else
                 {
                 SettingsBTN.IsEnabled = false;
                 }
             });
-        }
-        public void InstallBarValue(double value)
-        {
-            InstallBar.Value = value;
         }
 
         public void CacheBarVis(bool swtich)
@@ -169,12 +173,13 @@ namespace EmuDiscReader
 
         public async Task DisplayError(string message = "Disc Error")
         {
-
             ButtonVisble(true);
             AppService.GameReady = false;
             ImageBehavior.SetAnimatedSource(Disc, new BitmapImage(new Uri(
                 "pack://application:,,,/EmuDiscReader;component/Assets/diskError.gif")));
-            Description.Text = message;
+            DescPrefix.Text = message;
+            DescIconA.Visibility = Visibility.Collapsed;
+            DescSuffix.Text = "";
 
             await Task.Run(() =>
             {
@@ -185,7 +190,7 @@ namespace EmuDiscReader
 
             ImageBehavior.SetAnimatedSource(Disc, new BitmapImage(new Uri(
                 "pack://application:,,,/EmuDiscReader;component/Assets/spinningDisc.gif")));
-            Description.Text = "Please insert a Disc";
+            DescPrefix.Text = "Please insert a Disc";
         }
 
         /*
@@ -193,15 +198,22 @@ namespace EmuDiscReader
         /
         /
         */
-
-        private void SettingsBTN_Click(object sender, RoutedEventArgs e)
+        public void OpenSettingsPage()
         {
+            if(SettingsBTN.IsEnabled != true) { return; }
             AppService.InSettings = true;
             Settings setWin = new();
             setWin.Owner = this;
             setWin.ShowDialog();
+
+            //After Closing Settings page
             AppService.InSettings = false;
-            _ = pd.CheckDisc(this);
+            //_ = pd.CheckDisc(this);     //Check disc drive incase disc was inserted 
+        }
+
+        private void SettingsBTN_Click(object sender, RoutedEventArgs e)
+        {
+            OpenSettingsPage();
         }
 
         private async Task InitInstallBTN()
@@ -229,10 +241,31 @@ namespace EmuDiscReader
             AppService.PathEmu.WillCache = false;
             AppService.SaveJson();
         }
-
-        private void Play_Click(object sender, RoutedEventArgs e)
+        /*
+        /
+         Controller Support
+        /
+        */
+        public void InstallBTNController()
+        {
+            if (AppService.PathEmu is null) { return; }
+            if (AppService.PathEmu.WillCache)
+            {
+                InstallBTN.IsChecked = false;
+            } 
+            else
+            {
+                InstallBTN.IsChecked = true;
+            }
+        }
+        public void StartGameController()
         {
             pd.PlayGame();
+        }
+        protected override void OnClosed(EventArgs e)
+        {
+            sdlCont.CleanUpSDL();
+            base.OnClosed(e);
         }
     }
 
