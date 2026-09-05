@@ -224,7 +224,7 @@ namespace EmuDiscReader
 
             AppService.GameReady = true;
             MainForm.DescPrefix.Text = " Press";
-            MainForm.DescIconA.Visibility = Visibility.Visible;
+            MainForm.DescIcon.Visibility = Visibility.Visible;
             MainForm.DescSuffix.Text = "to Start";
             MainForm.ButtonVisble(true);
         }

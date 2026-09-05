@@ -40,7 +40,7 @@
                 <Run x:Name="DescPrefix" Text=" Please insert a Disc" FontSize="60"/>
                 <InlineUIContainer BaselineAlignment="Center">
                     <Image 
-                        x:Name="DescIconA"
+                        x:Name="DescIcon"
                         Source="/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-A.png" 
                         Height="79" 
                         Width="75" 
@@ -80,6 +80,7 @@
                 Click="SettingsBTN_Click"/>
 
             <Image 
+                x:Name="SettingBtnIcon"
                 Source="/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-B.png"
                 Margin="195,-6,-58,-6"/>
         </Grid>
@@ -109,6 +110,7 @@
                     Unchecked="InstallBTN_Unchecked" />
 
                 <Image 
+                    x:Name="InstallBtnIcon"
                     Source="/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-X.png" 
                     Margin="-58,-6,195,-6"/>
             </Grid>

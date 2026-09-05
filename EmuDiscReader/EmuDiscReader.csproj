@@ -9,6 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\ButtonIcon-PS4-Circle.png" />
+    <None Remove="Assets\ButtonIcon-PS4-Cross.png" />
+    <None Remove="Assets\ButtonIcon-PS4-Square.png" />
     <None Remove="Assets\ButtonIcon-Xbox360-A.png" />
     <None Remove="Assets\ButtonIcon-Xbox360-B.png" />
     <None Remove="Assets\ButtonIcon-Xbox360-X.png" />
@@ -27,6 +30,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\ButtonIcon-PS4-Circle.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\ButtonIcon-PS4-Cross.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\ButtonIcon-PS4-Square.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Assets\ButtonIcon-Xbox360-A.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>

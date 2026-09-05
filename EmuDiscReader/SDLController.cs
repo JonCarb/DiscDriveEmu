@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace EmuDiscReader
@@ -30,9 +31,10 @@ namespace EmuDiscReader
             }
         }
 
+        private string? currentController = "blank";
         private bool HandleEvent(SDL.Event sdlEvent)
         {
-            if(MainForm == null) { return false; } 
+            if(MainForm == null) { return false; }
             switch ((SDL.EventType)sdlEvent.Type)
             {
                 case SDL.EventType.GamepadAdded:
@@ -40,6 +42,10 @@ namespace EmuDiscReader
                     if (gpa != IntPtr.Zero)
                     {
                         Console.WriteLine($"Gamepad added: {SDL.GetGamepadName(gpa)}");
+                        if (_OGP.Count < 1) 
+                        { 
+                            ChangeDisplayButtons(sdlEvent.GDevice.Which); 
+                        }
                         _OGP[sdlEvent.GDevice.Which] = gpa;
                     }
                     break;
@@ -53,7 +59,8 @@ namespace EmuDiscReader
                     }
                     break;
                 case SDL.EventType.GamepadButtonDown:
-                    var which = sdlEvent.GButton.Which;
+                    uint which = sdlEvent.GButton.Which;
+                    ChangeDisplayButtons(which);
                     var button = (SDL.GamepadButton)sdlEvent.GButton.Button;
                     switch (button)
                     {
@@ -78,6 +85,35 @@ namespace EmuDiscReader
                     break;
             }
             return true;
+        }
+        private void ChangeDisplayButtons(uint which)
+        {
+            if(MainForm == null) {  return; }
+            string? controllerType = SDL.GetGamepadStringForType(SDL.GetGamepadTypeForID(which));
+            if (controllerType != null && currentController != controllerType)
+            {
+                currentController = controllerType;
+                Console.WriteLine(currentController);
+                switch (currentController)
+                {
+                    case "PS3":
+                    case "ps4":
+                    case "ps5":
+                        MainForm.InstallBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-PS4-Square.png", UriKind.Relative));
+                        MainForm.SettingBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-PS4-Circle.png", UriKind.Relative));
+                        MainForm.DescIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-PS4-Cross.png", UriKind.Relative));
+                        break;
+                    case "unknown":
+                    case "steam":
+                    case "xbox360":
+                    case "xboxone":
+                        MainForm.InstallBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-X.png", UriKind.Relative));
+                        MainForm.SettingBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-B.png", UriKind.Relative));
+                        MainForm.DescIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-A.png", UriKind.Relative));
+                        break;
+                    //Maybe add nintendo support
+                }
+            }
         }
         public void CleanUpSDL()
         {

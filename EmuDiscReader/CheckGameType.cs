@@ -50,6 +50,26 @@ namespace EmuDiscReader
                 return false;
             }
         }
+        public bool ReadXBOX360(string gamePath)
+        {
+            int offset = 0x0FDA0000;
+            int bufLength = 20;
+            try
+            {
+                using (FileStream fs = new(gamePath, FileMode.Open, FileAccess.Read))
+                {
+                    fs.Seek(offset, SeekOrigin.Begin);
+                    var buf = new byte[bufLength];
+                    fs.Read(buf, 0, bufLength);
+                    return (System.Text.Encoding.ASCII.GetString(buf) == "MICROSOFT*XBOX*MEDIA");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return false;
+            }
+        }
         public bool ReadPS3(string gamePath)
         {
             int offset = 0x800;

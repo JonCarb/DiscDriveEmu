@@ -128,7 +128,7 @@ namespace EmuDiscReader
             Dispatcher.Invoke(() =>
             {
                 DescPrefix.Text = message;
-                DescIconA.Visibility = Visibility.Collapsed;
+                DescIcon.Visibility = Visibility.Collapsed;
                 DescSuffix.Text = "";
             });
         }
@@ -178,7 +178,7 @@ namespace EmuDiscReader
             ImageBehavior.SetAnimatedSource(Disc, new BitmapImage(new Uri(
                 "pack://application:,,,/EmuDiscReader;component/Assets/diskError.gif")));
             DescPrefix.Text = message;
-            DescIconA.Visibility = Visibility.Collapsed;
+            DescIcon.Visibility = Visibility.Collapsed;
             DescSuffix.Text = "";
 
             await Task.Run(() =>
