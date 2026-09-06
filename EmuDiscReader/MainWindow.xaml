@@ -21,44 +21,48 @@
             </LinearGradientBrush>
         </Grid.Background>
 
+        <Viewbox
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Stretch="Uniform"
+            StretchDirection="Both">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Height="1123">
+                <Image 
+                    x:Name ="Disc" 
+                    gif:ImageBehavior.AnimatedSource="/EmuDiscReader;component/Assets/spinningDisc.gif" 
+                    Width="800" 
+                    Height="800"/>
 
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Image 
-                x:Name ="Disc" 
-                gif:ImageBehavior.AnimatedSource="/EmuDiscReader;component/Assets/spinningDisc.gif" 
-                Width="800" 
-                Height="800"
-                Panel.ZIndex= "-1"/>
-
-            <TextBlock 
-                x:Name="Description" 
-                FontSize="50" 
-                HorizontalAlignment="Center" 
-                FontStyle="Italic" 
-                Foreground="White" 
-                Margin="0,0,0,10">
-                <Run x:Name="DescPrefix" Text=" Please insert a Disc" FontSize="60"/>
-                <InlineUIContainer BaselineAlignment="Center">
-                    <Image 
-                        x:Name="DescIcon"
-                        Source="/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-A.png" 
-                        Height="79" 
-                        Width="75" 
-                        Margin="0,10,0,0"
-                        Visibility="Collapsed"/>
-                </InlineUIContainer>
-                <Run x:Name="DescSuffix" Text="" FontSize="60"/>
-            </TextBlock>
-            <ProgressBar 
-                x:Name="InstallBar" 
-                Minimum="0" 
-                Maximum="100" 
-                Value="0" 
-                Width="800" 
-                Height="23" Margin="0,0,0,10" 
-                Visibility ="Collapsed"/>
-        </StackPanel>
-
+                <TextBlock 
+                    x:Name="Description" 
+                    FontSize="50" 
+                    HorizontalAlignment="Center" 
+                    FontStyle="Italic" 
+                    Foreground="White" 
+                    Margin="0,-15,0,0">
+                    <Run x:Name="DescPrefix" Text=" Please insert a Disc" FontSize="60"/>
+                    <InlineUIContainer BaselineAlignment="Center">
+                        <Image 
+                            x:Name="DescIcon"
+                            Source="/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-A.png" 
+                            Height="79" 
+                            Width="75" 
+                            Margin="0,10,0,0"
+                            Visibility="Collapsed"/>
+                    </InlineUIContainer>
+                    <Run x:Name="DescSuffix" Text="" FontSize="60"/>
+                </TextBlock>
+                <ProgressBar 
+                    x:Name="InstallBar" 
+                    Minimum="0" 
+                    Maximum="100" 
+                    Value="0" 
+                    Width="800" 
+                    Height="23" Margin="0,0,0,10" 
+                    Visibility ="Collapsed"/>
+            </StackPanel>
+        </Viewbox>
+        
         <Image Source="/EmuDiscReader;component/Assets/scanline.png" Stretch="Fill"/>
 
         <Grid 
@@ -113,6 +117,33 @@
                     x:Name="InstallBtnIcon"
                     Source="/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-X.png" 
                     Margin="-58,-6,195,-6"/>
+            </Grid>
+        </Border>
+
+        <Border 
+         BorderBrush="Red"
+         BorderThickness="2"
+         CornerRadius="5"
+         Width="197"
+         Height="40"
+         Margin="0,20,70,0"
+         VerticalAlignment="Top"
+         HorizontalAlignment="Right">
+            <Grid>
+                <Button 
+                x:Name="QuitBTN" 
+                Background="{x:Null}" 
+                FontSize="18" 
+                Content="Quit" 
+                FontFamily="Yu Gothic UI" 
+                Cursor="Hand" 
+                Foreground="White" 
+                BorderBrush="Black" 
+                 Click="QuitBTN_Click"/>
+                <Image 
+                x:Name="QuitBtnIcon"
+                Source="/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-Y.png"
+                Margin="195,-6,-58,-6"/>
             </Grid>
         </Border>
 

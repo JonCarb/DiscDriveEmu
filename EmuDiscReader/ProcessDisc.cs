@@ -38,7 +38,7 @@ namespace EmuDiscReader
 
             if (driveExists) { await RunDisc(); }
         }
-        private void ResetValues()
+        public void ResetValues()
         {
             isRealPS2Game = false;
             nonIsoPS3Game = false;
@@ -78,6 +78,7 @@ namespace EmuDiscReader
             else
             {
                 await MainForm.DisplayError("Couldnt get game path");
+                MainForm.ButtonVisble(true);
             }
         }
 
@@ -191,12 +192,14 @@ namespace EmuDiscReader
             //Wont cache real PS2 Discs or certain ps3 formats, only ISO and single file formats
             if ( AppService.PathEmu.WillCache == true && !isRealPS2Game && !nonIsoPS3Game) 
             {
+                MainForm.ButtonVisble(false);   //Disable settings for noww
                 Console.WriteLine($"About to cache: Game Name: {gameName} game Path: {gamePath}");
                 Cache ca = new();
                 MainForm.ChangeDesc("Installing Game");
                 MainForm.CacheBarVis(true);
                 MainForm.InstallBar.Value = 0;
                 MainForm.InstallBTN.Content = "Cancel Install";
+
                 var progress = new Progress<double>(percentage =>
                 {
                     MainForm.InstallBar.Value = percentage;
@@ -264,7 +267,7 @@ namespace EmuDiscReader
             }
             MainForm.ChangeDesc("Starting Game");
             await Task.Delay(2000);
-            System.Windows.Application.Current.Shutdown();
+            MainForm.Quit();
         }
     }
 }

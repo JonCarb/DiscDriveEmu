@@ -85,6 +85,10 @@ namespace EmuDiscReader
                 {
                     _ = pd.CheckDisc(this);
                 }
+                if(wParam.ToInt32() == DBT_DEVICEREMOVECOMPLETE)
+                {
+                    _ = DisplayError("Disc Ejected");
+                }
             }
             return IntPtr.Zero;
         }
@@ -146,12 +150,13 @@ namespace EmuDiscReader
             {
                 if (swtich)
                 {
-                SettingsBTN.IsEnabled = true;
-                
+                    SettingsBTN.IsEnabled = true;
+                    SettingsBTN.Opacity = 1;
                 }
                 else
                 {
-                SettingsBTN.IsEnabled = false;
+                    SettingsBTN.Opacity = 0.6;
+                    SettingsBTN.IsEnabled = false;
                 }
             });
         }
@@ -173,8 +178,11 @@ namespace EmuDiscReader
 
         public async Task DisplayError(string message = "Disc Error")
         {
-            ButtonVisble(true);
-            AppService.GameReady = false;
+            //Upon failure
+            ButtonVisble(true);             //Allow settings button to work again
+            pd.ResetValues();               //Reset the values of what was read (to not allow install or play)
+            AppService.GameReady = false;   //Not allow app to run any program 
+
             ImageBehavior.SetAnimatedSource(Disc, new BitmapImage(new Uri(
                 "pack://application:,,,/EmuDiscReader;component/Assets/diskError.gif")));
             DescPrefix.Text = message;
@@ -261,6 +269,15 @@ namespace EmuDiscReader
         public void StartGameController()
         {
             pd.PlayGame();
+        }
+
+        private void QuitBTN_Click(object sender, RoutedEventArgs e)
+        {
+            Quit();
+        }
+        public void Quit()
+        {
+            System.Windows.Application.Current.Shutdown();
         }
         protected override void OnClosed(EventArgs e)
         {

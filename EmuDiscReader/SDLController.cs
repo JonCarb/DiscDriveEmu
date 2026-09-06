@@ -14,6 +14,7 @@ namespace EmuDiscReader
         private readonly Dictionary<uint, IntPtr> _OGP = new();
         private DispatcherTimer t = new();
         private MainWindow? MainForm;
+        private string? currentController = "blank";
         public void InitSDL(MainWindow f)
         {
             this.MainForm = f;
@@ -31,7 +32,6 @@ namespace EmuDiscReader
             }
         }
 
-        private string? currentController = "blank";
         private bool HandleEvent(SDL.Event sdlEvent)
         {
             if(MainForm == null) { return false; }
@@ -42,7 +42,7 @@ namespace EmuDiscReader
                     if (gpa != IntPtr.Zero)
                     {
                         Console.WriteLine($"Gamepad added: {SDL.GetGamepadName(gpa)}");
-                        if (_OGP.Count < 1) 
+                        if (_OGP.Count < 1) //Only change button displays for the first controller it gets
                         { 
                             ChangeDisplayButtons(sdlEvent.GDevice.Which); 
                         }
@@ -64,19 +64,20 @@ namespace EmuDiscReader
                     var button = (SDL.GamepadButton)sdlEvent.GButton.Button;
                     switch (button)
                     {
-                        case SDL.GamepadButton.North:       //IDK
-                            Console.WriteLine("Y pressed");
+                        case SDL.GamepadButton.North:       //Quit
+                            //Console.WriteLine("Y pressed");
+                            MainForm.Quit();
                             break;
                         case SDL.GamepadButton.East:        //Settings Button
-                            Console.WriteLine("B pressed");
+                            //Console.WriteLine("B pressed");
                             MainForm.OpenSettingsPage();
                             break;
                         case SDL.GamepadButton.West:        //Cache/Install Game
-                            Console.WriteLine("X pressed");
+                            //Console.WriteLine("X pressed");
                             MainForm.InstallBTNController();
                             break;
                         case SDL.GamepadButton.South:       //Start Game
-                            Console.WriteLine("A pressed");
+                            //Console.WriteLine("A pressed");
                             MainForm.StartGameController();
                             break;
                     }
@@ -96,19 +97,18 @@ namespace EmuDiscReader
                 Console.WriteLine(currentController);
                 switch (currentController)
                 {
-                    case "PS3":
+                    case "ps3":
                     case "ps4":
                     case "ps5":
                         MainForm.InstallBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-PS4-Square.png", UriKind.Relative));
                         MainForm.SettingBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-PS4-Circle.png", UriKind.Relative));
+                        MainForm.QuitBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-PS4-Triangle.png", UriKind.Relative));
                         MainForm.DescIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-PS4-Cross.png", UriKind.Relative));
                         break;
-                    case "unknown":
-                    case "steam":
-                    case "xbox360":
-                    case "xboxone":
+                    default:
                         MainForm.InstallBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-X.png", UriKind.Relative));
                         MainForm.SettingBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-B.png", UriKind.Relative));
+                        MainForm.QuitBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-Y.png", UriKind.Relative));
                         MainForm.DescIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-A.png", UriKind.Relative));
                         break;
                     //Maybe add nintendo support
