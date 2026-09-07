@@ -103,13 +103,13 @@ namespace EmuDiscReader
                         MainForm.InstallBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-PS4-Square.png", UriKind.Relative));
                         MainForm.SettingBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-PS4-Circle.png", UriKind.Relative));
                         MainForm.QuitBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-PS4-Triangle.png", UriKind.Relative));
-                        MainForm.DescIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-PS4-Cross.png", UriKind.Relative));
+                        MainForm.DescIconImg.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-PS4-Cross.png", UriKind.Relative));
                         break;
                     default:
                         MainForm.InstallBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-X.png", UriKind.Relative));
                         MainForm.SettingBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-B.png", UriKind.Relative));
                         MainForm.QuitBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-Y.png", UriKind.Relative));
-                        MainForm.DescIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-A.png", UriKind.Relative));
+                        MainForm.DescIconImg.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-A.png", UriKind.Relative));
                         break;
                     //Maybe add nintendo support
                 }

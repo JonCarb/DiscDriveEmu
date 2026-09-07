@@ -47,6 +47,7 @@ namespace EmuDiscReader
             gameName = "NULL";
             discArg = " ";
             emulator = "NULL";
+            isBusy = false;
         }
         private async Task RunDisc()
         {
@@ -269,7 +270,6 @@ namespace EmuDiscReader
                     System.Diagnostics.Process.Start(AppService.PathEmu.Xenia, "--fullscreen " + "\"" + gamePath + "\"");
                     break;
                 default:
-                    isBusy = false;
                     await MainForm.DisplayError("Unknown/Unsupported Disc"); return;
             }
             MainForm.ChangeDesc("Starting Game");

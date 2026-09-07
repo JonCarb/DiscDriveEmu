@@ -32,7 +32,7 @@
                     gif:ImageBehavior.AnimatedSource="/EmuDiscReader;component/Assets/spinningDisc.gif" 
                     Width="800" 
                     Height="800"/>
-
+                
                 <TextBlock 
                     x:Name="Description" 
                     FontSize="50" 
@@ -42,14 +42,21 @@
                     Margin="0,-15,0,0" Height="88">
                     <Run x:Name="DescPrefix" Text=" Please insert a Disc" FontSize="60"/>
                     <InlineUIContainer BaselineAlignment="Center">
-                        <Image 
-                            x:Name="DescIcon"
-                            Source="/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-A.png" 
-                            Height="79" 
-                            Width="75" 
-                            Margin="0,10,0,0"
-                            Visibility="Collapsed"
-                            Cursor="Hand"/>
+                      <Button 
+                        x:Name="DescIcon"
+                        Width="75"
+                        Height="79"
+                        Margin="0,10,0,0"
+                        Visibility="Collapsed"
+                        Cursor="Hand"
+                        Padding="0"
+                        BorderThickness="0"
+                        Background="Transparent"
+                        Click="PlayBTN">
+                        <Button.Content>
+                            <Image x:Name="DescIconImg" Source="/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-A.png"/>
+                        </Button.Content>
+                    </Button>
                     </InlineUIContainer>
                     <Run x:Name="DescSuffix" Text="" FontSize="60"/>
                 </TextBlock>
@@ -64,8 +71,8 @@
                     />
             </StackPanel>
         </Viewbox>
-        
-        <Image Source="/EmuDiscReader;component/Assets/scanline.png" Stretch="Fill"/>
+
+        <Image Source="/EmuDiscReader;component/Assets/scanline.png" Stretch="Fill" IsHitTestVisible="False"/>
 
         <Grid 
             Margin="0,0,70,20" 

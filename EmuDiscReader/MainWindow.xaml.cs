@@ -249,6 +249,10 @@ namespace EmuDiscReader
             AppService.PathEmu.WillCache = false;
             AppService.SaveJson();
         }
+        private void PlayBTN(object sender, RoutedEventArgs e)
+        {
+            pd.PlayGame();
+        }
         /*
         /
          Controller Support
