@@ -154,17 +154,19 @@ namespace EmuDiscReader
                 string fileEx = Path.GetExtension(gamePath).ToUpper();
                 if (fileEx == ".ISO")
                 {
-                    if (CGT.ReadGCWII(gamePath)) { emuName = "DOLPHIN"; }   //reads 1 byte
-                    else if (CGT.ReadXBOX(gamePath)) { emuName = "XEMU"; }  //seeks and reads 20 bytes
-                    else if (CGT.ReadPS3(gamePath)) { emuName = "RPCS3"; }  //seeks and reads 12 bytes
-                    else if (CGT.ReadPS2(gamePath)) { emuName = "PCSX2"; }  //converts whole iso (twice maybe) and checks (expensive so last case)
+                    if (CGT.ReadGCWII(gamePath)) { emuName = "DOLPHIN"; }       //reads 1 byte
+                    else if (CGT.ReadPS3(gamePath)) { emuName = "RPCS3"; }      //seeks and reads 12 bytes
+                    else if (CGT.ReadXBOX(gamePath)) { emuName = "XEMU"; }      //seeks and reads 20 bytes
+                    else if (CGT.ReadXBOX360(gamePath)) { emuName = "XENIA"; }  //seeks and reads 20 bytes
+                    else if (CGT.ReadPS2(gamePath)) { emuName = "PCSX2"; }      //converts whole iso (twice maybe) and checks (expensive so last case)
                     //Add other emulators
                 }
                 else
                 {
                     //Add method for Non-iso files (Wii u, etc)
-                    if (CGT.ReadWiiU(fileEx)) { emuName = "CEMU"; }             //Check for CEMU supported extensions
-                    if (CGT.ReadGCWIINonIso(fileEx)) { emuName = "DOLPHIN"; }   //Checks for dolphin supported extensions thats not ISO
+                    if (CGT.ReadWiiU(fileEx)) { emuName = "CEMU"; }                 //Check for CEMU supported extensions
+                    else if (CGT.ReadGCWIINonIso(fileEx)) { emuName = "DOLPHIN"; }  //Checks for dolphin supported extensions thats not ISO
+                    else if(CGT.ReadXbox360NonIso(fileEx)) { emuName = "XENIA"; }  //Checks if file is xex for Xenia
                 }
             });
 
@@ -192,6 +194,7 @@ namespace EmuDiscReader
             //Wont cache real PS2 Discs or certain ps3 formats, only ISO and single file formats
             if ( AppService.PathEmu.WillCache == true && !isRealPS2Game && !nonIsoPS3Game) 
             {
+                AppService.GameReady = false;
                 MainForm.ButtonVisble(false);   //Disable settings for noww
                 Console.WriteLine($"About to cache: Game Name: {gameName} game Path: {gamePath}");
                 Cache ca = new();
@@ -260,6 +263,10 @@ namespace EmuDiscReader
                 case "RPCS3":
                     if (File.Exists(AppService.PathEmu.RPCS3) == false) { await MainForm.DisplayError("NO RPCS3 (PS3) PATH"); return; }
                     System.Diagnostics.Process.Start(AppService.PathEmu.RPCS3, " " + "\"" + gamePath + "\"");
+                    break;
+                case "XENIA":
+                    if (File.Exists(AppService.PathEmu.Xenia) == false) { await MainForm.DisplayError("NO Xenia (XBOX 360) PATH"); return; }
+                    System.Diagnostics.Process.Start(AppService.PathEmu.Xenia, "--fullscreen " + "\"" + gamePath + "\"");
                     break;
                 default:
                     isBusy = false;

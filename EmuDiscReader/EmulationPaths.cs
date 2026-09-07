@@ -18,5 +18,6 @@ namespace EmuDiscReader
         public bool WillCache { get; set; }
 
         //Maybe potentially add more values like cmd parameters, specific folder for caching, etc
+        //public string? CustomInstallPath { get; set; }
     }
 }

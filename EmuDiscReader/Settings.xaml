@@ -17,28 +17,80 @@
             </LinearGradientBrush>
         </Grid.Background>
 
-
-        <Border
-            VerticalAlignment="Top"
-            Height="291"
-            Margin="105,26,105,0"
-            Background="#FF525252"
-            BorderBrush="White"
-            BorderThickness="2">
-
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
             <StackPanel>
-                <TextBlock x:Name="Label" Text="Emulator Paths" FontSize="35" FontStyle="Italic" Foreground="White" Margin="0,0,0,20" FontWeight="Bold" HorizontalAlignment="Center" />
+                <Border
+                    Height="332"
+                    Margin="105,26,105,0"
+                    Background="#FF525252"
+                    BorderBrush="White"
+                    BorderThickness="2">
 
-                <TextBlock x:Name="Dolphin" Text="Dolphin Path:" FontStyle="Italic" Foreground="#FFCCCCCC" FontSize="22" Margin="10,0,10,5"/>
-                <TextBlock x:Name="Xemu" Text="Xemu Path:" FontStyle="Italic" Foreground="#FFCCCCCC" FontSize="22" Margin="10,0,10,5"/>
-                <TextBlock x:Name="PCSX2" Text="PCSX2 Path:" FontStyle="Italic" Foreground="#FFCCCCCC" FontSize="22" Margin="10,0,10,5"/>
-                <TextBlock x:Name="RPCS3" Text="RPCS3 Path:"  FontStyle="Italic" Foreground="#FFCCCCCC" FontSize="22" Margin="10,0,10,5"/>
-                <TextBlock x:Name="Cemu" Text="Cemu Path:"  FontStyle="Italic" Foreground="#FFCCCCCC" FontSize="22" Margin="10,0,10,5"/>
+                    <StackPanel>
+                        <TextBlock x:Name="Label" Text="Emulator Paths" FontSize="35" FontStyle="Italic" Foreground="White" Margin="0,0,0,20" FontWeight="Bold" HorizontalAlignment="Center" />
 
-                <Button x:Name="AddPath" Width="200" Height="35" HorizontalAlignment="Right" 
-                     Background="{x:Null}" FontSize="22" Content="Add..." Margin="0,5,10,0" 
-                     FontFamily="Yu Gothic UI" Cursor="Hand" VerticalAlignment="Bottom" Foreground="White" BorderBrush="#FF1FFF00" Click="AddPath_Click"/>
+                        <TextBlock x:Name="Dolphin" Text="Dolphin Path:" FontStyle="Italic" Foreground="#FFCCCCCC" FontSize="22" Margin="10,0,10,5"/>
+                        <TextBlock x:Name="Xemu" Text="Xemu Path:" FontStyle="Italic" Foreground="#FFCCCCCC" FontSize="22" Margin="10,0,10,5"/>
+                        <TextBlock x:Name="Xenia" Text="Xenia Path:" FontStyle="Italic" Foreground="#FFCCCCCC" FontSize="22" Margin="10,0,10,5"/>
+                        <TextBlock x:Name="PCSX2" Text="PCSX2 Path:" FontStyle="Italic" Foreground="#FFCCCCCC" FontSize="22" Margin="10,0,10,5"/>
+                        <TextBlock x:Name="RPCS3" Text="RPCS3 Path:"  FontStyle="Italic" Foreground="#FFCCCCCC" FontSize="22" Margin="10,0,10,5"/>
+                        <TextBlock x:Name="Cemu" Text="Cemu Path:"  FontStyle="Italic" Foreground="#FFCCCCCC" FontSize="22" Margin="10,0,10,5"/>
+
+                        <Button 
+                            x:Name="AddPath" 
+                            Width="200" 
+                            Height="35" 
+                            HorizontalAlignment="Right" 
+                            Background="{x:Null}" 
+                            FontSize="22" 
+                            Content="Add..." 
+                            Margin="0,5,10,0" 
+                            FontFamily="Yu Gothic UI" 
+                            Cursor="Hand" 
+                            VerticalAlignment="Bottom" 
+                            Foreground="White" 
+                            BorderBrush="#FF1FFF00" 
+                            Click="AddPath_Click"/>
+                    </StackPanel>
+                </Border>
+
+                <Border
+                    Margin="105,20,105,0"
+                    Background="#FF525252"
+                    BorderBrush="White"
+                    BorderThickness="2">
+
+                    <StackPanel>
+                        <TextBlock Text="Installed Games" FontSize="35" FontStyle="Italic" Foreground="White" Margin="0,0,0,20" FontWeight="Bold" HorizontalAlignment="Center" />
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock x:Name="DefaultPath" Text="Default Path:" FontSize="20" FontStyle="Italic" Foreground="#FFCCCCCC" VerticalAlignment="Center" Margin="0,0,10,0"/>
+
+                        </StackPanel>
+
+                        <ItemsControl x:Name="DefaultFolderList">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" FontStyle="Italic" Foreground="#FFCCCCCC" FontSize="22" Margin="10,10,10,5"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Button 
+                                x:Name="DeleteBTN"
+                                Content="Delete Games" 
+                                Width="200" 
+                                Height="35" 
+                                Background="{x:Null}" 
+                                Foreground="White" 
+                                BorderBrush="Red" 
+                                Cursor="Hand" 
+                                FontSize="20" 
+                                HorizontalAlignment="Right"
+                                Margin="0,0,10,10" Click="DeleteBTN_Click" 
+                        />
+                    </StackPanel>
+                </Border>
             </StackPanel>
-        </Border>
+        </ScrollViewer>
     </Grid>
 </Window>

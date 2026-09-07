@@ -154,5 +154,9 @@ namespace EmuDiscReader
             }
             return false;
         }
+        public bool ReadXbox360NonIso(string fileExtension)
+        {
+            return (fileExtension == ".XEX");
+        }
     }
 }

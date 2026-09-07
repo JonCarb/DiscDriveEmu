@@ -21,11 +21,18 @@ namespace EmuDiscReader
 
                 try
                 {
-                    destination = await AppService.DocumentsFolder.GetFolderAsync("CachedGames");
+                    //if (AppService.PathEmu.CustomInstallPath != null)
+                    //{
+                        //destination = await StorageFolder.GetFolderFromPathAsync(AppService.PathEmu.CustomInstallPath);
+                    //}
+                    //else
+                    //{
+                        destination = await AppService.DocumentsFolder.GetFolderAsync("CachedGames");
+                    //}
                 }
                 catch
                 {
-                    destination = await AppService.DocumentsFolder.CreateFolderAsync("CachedGames");
+                    destination = await AppService.DocumentsFolder.CreateFolderAsync("CachedGames");    //If folder doesnt exist for both, fall back to default (documents)
                 }
 
                 StorageFolder subFolder;
