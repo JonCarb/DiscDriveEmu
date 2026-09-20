@@ -51,7 +51,11 @@ namespace EmuDiscReader
         }
         private async Task RunDisc()
         {
-            if (MainForm == null) { Console.WriteLine("Form is null"); return; }
+            if (MainForm == null) 
+            { 
+                //Console.WriteLine("Form is null"); 
+                return; 
+            }
 
             //Disable Settings Button
             MainForm.ButtonVisble(false);
@@ -71,7 +75,7 @@ namespace EmuDiscReader
 
             if (await GetGamePath())
             {
-                Console.WriteLine(gamePath);
+                //Console.WriteLine(gamePath);
                 emulator = await ChooseEmulator();
                 discChecked = true;
                 await ReadyGame();
@@ -101,7 +105,11 @@ namespace EmuDiscReader
             //Reset values in case disc get swapped
             ResetValues();
 
-            if (MainForm == null) { Console.WriteLine("Form is null"); return false; }
+            if (MainForm == null) 
+            { 
+                //Console.WriteLine("Form is null"); 
+                return false; 
+            }
             string? fileName = null;
 
             await Task.Run(() =>
@@ -127,7 +135,8 @@ namespace EmuDiscReader
             if (nonIsoPS3Game)
             {
                 gamePath = Path.Combine(discDrive, "PS3_GAME");
-                Console.WriteLine(gamePath);
+                //gamePath = discDrive;
+                //Console.WriteLine(gamePath);
                 return true;
             }
 
@@ -143,7 +152,7 @@ namespace EmuDiscReader
 
         private async Task<string> ChooseEmulator()
         {
-            Console.WriteLine("Choose EMU Called");
+            //Console.WriteLine("Choose EMU Called");
 
             if (isRealPS2Game) { return "PCSX2"; } //IF its a real ps2 disc, just return ps2
             if (nonIsoPS3Game) { return "RPCS3"; } //No need to check ISO, return for ps3
@@ -175,12 +184,16 @@ namespace EmuDiscReader
         }
         public async Task ReadyGame()
         {
-            if (MainForm == null) { Console.WriteLine("Form is null"); return; }
+            if (MainForm == null) 
+            { 
+                //Console.WriteLine("Form is null"); 
+                return; 
+            }
             if (AppService.PathEmu == null) { await MainForm.DisplayError("Path Class is NULL!"); return; }
 
             if (!discChecked)
             {
-                Console.WriteLine("No disc has been checked yet.");
+                //Console.WriteLine("No disc has been checked yet.");
                 return;
             }
             if (emulator == "NULL" || emulator == "NONE")
@@ -197,7 +210,7 @@ namespace EmuDiscReader
             {
                 AppService.GameReady = false;
                 MainForm.ButtonVisble(false);   //Disable settings for noww
-                Console.WriteLine($"About to cache: Game Name: {gameName} game Path: {gamePath}");
+                //Console.WriteLine($"About to cache: Game Name: {gameName} game Path: {gamePath}");
                 Cache ca = new();
                 MainForm.ChangeDesc("Installing Game");
                 MainForm.CacheBarVis(true);
@@ -230,16 +243,36 @@ namespace EmuDiscReader
             }
 
             AppService.GameReady = true;
+            MainForm.ButtonVisble(true);    //Settings button gets turned back on
+            if (AppService.PathEmu.WillAutoStart) { 
+                PlayGame();
+                return;     //leave, no need to show A button
+            }
+
             MainForm.DescPrefix.Text = " Press";
             MainForm.DescIcon.Visibility = Visibility.Visible;
             MainForm.DescSuffix.Text = "to Start";
-            MainForm.ButtonVisble(true);
         }
         public async void PlayGame()
         {
-            if (MainForm == null) { Console.WriteLine("Form is null"); return; }
-            if (AppService.PathEmu == null) { await MainForm.DisplayError("Path Class is NULL!"); return; }
-            if(AppService.GameReady == false) { Console.WriteLine("Disc not ready!"); return; }
+            if (MainForm == null) 
+            { 
+                //Console.WriteLine("Form is null");
+                return; 
+            }
+
+            if (AppService.PathEmu == null) 
+            { 
+                await MainForm.DisplayError("Path Class is NULL!"); 
+                return; 
+            }
+
+            if(AppService.GameReady == false) 
+            { 
+                //Console.WriteLine("Disc not ready!");
+                return; 
+            }
+
             if(isBusy) { return; }
 
             isBusy = true;

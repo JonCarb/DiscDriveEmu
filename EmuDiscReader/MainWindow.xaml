@@ -130,6 +130,37 @@
         </Border>
 
         <Border 
+          BorderBrush="#FF587B7A"
+          BorderThickness="2"
+          CornerRadius="5"
+          Width="197"
+          Height="40"
+          Margin="70,20,0,0"
+          VerticalAlignment="Top"
+          HorizontalAlignment="Left">
+
+            <Grid>
+                <CheckBox 
+                  x:Name="AutoPlayBTN"
+                  HorizontalContentAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  FontSize="18"
+                  Content="Auto-Start"
+                  FontFamily="Yu Gothic UI"
+                  Cursor="Hand"
+                  Foreground="White"
+                  HorizontalAlignment="Center" Width="127" 
+                  Checked="AutoPlayBTN_Checked"
+                  Unchecked="AutoPlayBTN_Unchecked"/>
+
+                <Image 
+                  x:Name="AutoPlayBtnIcon"
+                  Source="/EmuDiscReader;component/Assets/ButtonIcon-XboxOne-LB.png" 
+                  Margin="-58,-6,195,-6"/>
+            </Grid>
+        </Border>
+
+        <Border 
          BorderBrush="Red"
          BorderThickness="2"
          CornerRadius="5"

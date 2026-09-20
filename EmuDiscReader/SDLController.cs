@@ -41,7 +41,7 @@ namespace EmuDiscReader
                     var gpa = SDL.OpenGamepad(sdlEvent.GDevice.Which);
                     if (gpa != IntPtr.Zero)
                     {
-                        Console.WriteLine($"Gamepad added: {SDL.GetGamepadName(gpa)}");
+                        //Console.WriteLine($"Gamepad added: {SDL.GetGamepadName(gpa)}");
                         if (_OGP.Count < 1) //Only change button displays for the first controller it gets
                         { 
                             ChangeDisplayButtons(sdlEvent.GDevice.Which); 
@@ -53,7 +53,7 @@ namespace EmuDiscReader
                     var gpr = SDL.GetGamepadFromID(sdlEvent.GDevice.Which);
                     if (gpr != IntPtr.Zero)
                     {
-                        Console.WriteLine($"Gamepad Removed: {SDL.GetGamepadName(gpr)}");
+                        //Console.WriteLine($"Gamepad Removed: {SDL.GetGamepadName(gpr)}");
                         _OGP.Remove(sdlEvent.GDevice.Which);
                         SDL.CloseGamepad(gpr);
                     }
@@ -80,6 +80,9 @@ namespace EmuDiscReader
                             //Console.WriteLine("A pressed");
                             MainForm.StartGameController();
                             break;
+                        case SDL.GamepadButton.LeftShoulder:
+                            MainForm.AutoStartBTNController();
+                            break;
                     }
                     break;
                 default:
@@ -94,7 +97,7 @@ namespace EmuDiscReader
             if (controllerType != null && currentController != controllerType)
             {
                 currentController = controllerType;
-                Console.WriteLine(currentController);
+                //Console.WriteLine(currentController);
                 switch (currentController)
                 {
                     case "ps3":
@@ -104,12 +107,14 @@ namespace EmuDiscReader
                         MainForm.SettingBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-PS4-Circle.png", UriKind.Relative));
                         MainForm.QuitBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-PS4-Triangle.png", UriKind.Relative));
                         MainForm.DescIconImg.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-PS4-Cross.png", UriKind.Relative));
+                        MainForm.AutoPlayBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-PS4-L1.png", UriKind.Relative));
                         break;
                     default:
                         MainForm.InstallBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-X.png", UriKind.Relative));
                         MainForm.SettingBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-B.png", UriKind.Relative));
                         MainForm.QuitBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-Y.png", UriKind.Relative));
                         MainForm.DescIconImg.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-Xbox360-A.png", UriKind.Relative));
+                        MainForm.AutoPlayBtnIcon.Source = new BitmapImage(new Uri("/EmuDiscReader;component/Assets/ButtonIcon-XboxOne-LB.png", UriKind.Relative));
                         break;
                     //Maybe add nintendo support
                 }

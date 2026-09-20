@@ -105,7 +105,7 @@ namespace EmuDiscReader
                         if (percentage - lastReportedPercentage >= 1.0 || percentage >= 100.0)
                         {
                             lastReportedPercentage = percentage;
-                            Console.WriteLine($"PROGRESS: {percentage:F1}%");
+                            //Console.WriteLine($"PROGRESS: {percentage:F1}%");
                             progress?.Report(percentage);
                         }
                     }
@@ -118,17 +118,17 @@ namespace EmuDiscReader
             }
             catch (UnauthorizedAccessException ex)
             {
-                Console.WriteLine($"Permission denied: {ex.Message}");
+                //Console.WriteLine($"Permission denied: {ex.Message}");
                 return null;
             }
             catch (FileNotFoundException ex)
             {
-                Console.WriteLine($"Source file not found: {ex.Message}");
+                //Console.WriteLine($"Source file not found: {ex.Message}");
                 return null;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error has occurred: {ex.Message}");
+                //Console.WriteLine($"An error has occurred: {ex.Message}");
                 return null;
             }
         }

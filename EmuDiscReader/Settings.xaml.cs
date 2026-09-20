@@ -66,7 +66,7 @@ namespace EmuDiscReader
             folders.Clear();
             foreach (string dir in Directory.GetDirectories(fullPath))
             {
-                Console.WriteLine(dir);
+                //Console.WriteLine(dir);
                 folders.Add(System.IO.Path.GetFileName(dir));
             }
         }
@@ -137,7 +137,7 @@ namespace EmuDiscReader
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                //Console.WriteLine(ex.ToString());
             }
         }
         private void DeleteBTN_Click(object sender, RoutedEventArgs e)
@@ -166,7 +166,7 @@ namespace EmuDiscReader
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                //Console.WriteLine(ex.ToString());
             }
 
         }

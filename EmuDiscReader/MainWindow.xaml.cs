@@ -38,7 +38,11 @@ namespace EmuDiscReader
 
             public static void SaveJson()
             {
-                if (PathEmu == null || PathsFile == null) { Console.WriteLine("PathEmu or PathsFile were NULL"); return; }
+                if (PathEmu == null || PathsFile == null) 
+                { 
+                    //Console.WriteLine("PathEmu or PathsFile were NULL"); 
+                    return; 
+                }
                 string json = JsonSerializer.Serialize(PathEmu, AppJsonContext.Default.EmulationPaths);
                 File.WriteAllText(PathsFile.Path, json);
             }
@@ -51,12 +55,12 @@ namespace EmuDiscReader
         private const int DBT_DEVICEARRIVAL = 0x8000;
         private const int DBT_DEVICEREMOVECOMPLETE = 0x8004;
         private bool initInstall = true;
+        private bool initAutoStart = true;
         private ProcessDisc pd;
         private SDLController sdlCont;
 
         public MainWindow()
         {
-            Console.WriteLine("To you 5000 years from now");
             InitializeComponent();
             pd = new ProcessDisc();
             sdlCont = new();
@@ -64,6 +68,7 @@ namespace EmuDiscReader
             SourceInitialized += MainWindow_SourceInitialized;
             _ = LoadEmulatorJson();
             _ = InitInstallBTN();
+            _ = InitAutoStartBTN();
 
             AppService.GameReady = false;
 
@@ -102,18 +107,19 @@ namespace EmuDiscReader
                 ("EmulatorPaths.json", CreationCollisionOption.OpenIfExists);
 
             string readJson = await FileIO.ReadTextAsync(AppService.PathsFile);
-            Console.WriteLine(readJson);
+            //Console.WriteLine(readJson);
 
             //Fill file if its empty
             if (string.IsNullOrWhiteSpace(readJson))
             {
                 AppService.PathEmu = new();
                 AppService.PathEmu.WillCache = false;
+                AppService.PathEmu.WillAutoStart = false;
 
                 string newJson = JsonSerializer.Serialize(AppService.PathEmu,AppJsonContext.Default.EmulationPaths);
 
                 File.WriteAllText(AppService.PathsFile.Path, newJson);
-                Console.WriteLine(newJson);
+                //Console.WriteLine(newJson);
             }
             //Read the content and load it into the class
             else
@@ -249,10 +255,38 @@ namespace EmuDiscReader
             AppService.PathEmu.WillCache = false;
             AppService.SaveJson();
         }
-        private void PlayBTN(object sender, RoutedEventArgs e)
+
+        private async Task InitAutoStartBTN()
         {
+            await AppService.EmuLoaded.Task;
+            if (AppService.PathEmu is null) { return; }
+            AutoPlayBTN.IsChecked = AppService.PathEmu.WillAutoStart;
+            initAutoStart = false;
+        }
+
+        private async void AutoPlayBTN_Checked(object sender, RoutedEventArgs e)
+        {
+            if(initAutoStart) { return; }
+            if (AppService.PathEmu is null) { return; }
+            await AppService.EmuLoaded.Task;
+            AppService.PathEmu.WillAutoStart = true;
+            AppService.SaveJson();
             pd.PlayGame();
         }
+        private async void AutoPlayBTN_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (initAutoStart) { return; }
+            if (AppService.PathEmu is null) { return; }
+            await AppService.EmuLoaded.Task;
+            AppService.PathEmu.WillAutoStart = false;
+            AppService.SaveJson();
+        }
+
+        private void PlayBTN(object sender, RoutedEventArgs e)
+        {
+            StartGameController();
+        }
+
         /*
         /
          Controller Support
@@ -270,8 +304,21 @@ namespace EmuDiscReader
                 InstallBTN.IsChecked = true;
             }
         }
+        public void AutoStartBTNController()
+        {
+            if (AppService.PathEmu is null) { return; }
+            if (AppService.PathEmu.WillAutoStart)
+            {
+                AutoPlayBTN.IsChecked = false;
+            }
+            else
+            {
+                AutoPlayBTN.IsChecked = true;
+            }
+        }
         public void StartGameController()
         {
+            if(AppService.PathEmu is null || AppService.PathEmu.WillAutoStart == true) { return; }
             pd.PlayGame();
         }
 
@@ -288,6 +335,7 @@ namespace EmuDiscReader
             sdlCont.CleanUpSDL();
             base.OnClosed(e);
         }
+
     }
 
     [JsonSourceGenerationOptions(WriteIndented = false)]
