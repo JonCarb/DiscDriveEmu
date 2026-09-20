@@ -14,7 +14,7 @@ A simple GUI that reads discs with retro console files and executes them with th
 | Xemu         | Xbox     |DVD, DVD-DL, Blu-Ray          | No                 | XISO                                      |
 | Xenia        | Xbox 360 |DVD-DL, Blu-Ray               | No                 | ISO, XEX                                  |
 | PCSX2        | PS2      |DVD, DVD-DL, Blu-Ray          | YES                | ISO, (original file format)               |
-| RPCS3        | PS3      |DVD-DL, Blu-Ray               | No                 | Decomp ISO, PS3_DISC.SFB with PS3_GAME Dir|
+| RPCS3        | PS3      |DVD-DL, Blu-Ray               | Sorta (read below) | Decomp ISO, PS3_DISC.SFB with PS3_GAME Dir|
 
 ## Notes
 * This app is currently Windows only!
@@ -23,6 +23,18 @@ A simple GUI that reads discs with retro console files and executes them with th
 * A good disc drive is needed for a smooth user experience
 * While not needed, a Blu-ray drive is HIGHLY recommended. You can get away with a regular DVD drive and its related speeds, but you'll miss out on games over 8.5 GB.
 * A controller is recommended for a better user experience
+
+## Real PS3 Disc
+* Before trying to use real PS3 Discs, make sure you followed the steps in the RPCS3 Emulator itself
+* (https://wiki.rpcs3.net/index.php?title=Help:Dumping_PlayStation_3_games#Booting_games_directly_from_a_Blu-ray_Drive_on_Windows/Linux/MacOS)
+* Currently, support for PS3 Discs is in a weird state because this application DOES recognize it as a PS3 game and correctly boots RPCS3, but RPCS3 itself currently doesnt support booting discs through the command line.
+* A disappointing but current workaround is:
+1. Insert the PS3 disc as normal
+2. When RPCS3 boots up, it will try and fail the initial command, so it will "freeze". Don't rush it.
+3. Once the games library appears in RPCS3, find the correct game you inserted and make sure its thumbnail is loaded.
+4. The game should give you the option to restart; click the game, click Restart, and patiently wait.
+5. After a short bit, the game should start running, and you can now play off your disc!
+* When RPCS3 releases better support for discs, this app will be updated.
 
 ## Source Code Installation
 1. Install .NET (8 or above) https://dotnet.microsoft.com/en-us/download 
