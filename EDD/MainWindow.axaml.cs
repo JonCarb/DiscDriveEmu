@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -24,7 +25,7 @@ public partial class MainWindow : Window
         Console.WriteLine(Directory.GetCurrentDirectory());
         _ = InitStartUp();
     }
-
+    
     //Loads up components for drives, checks and visual aspects
     private async Task InitStartUp()
     {
@@ -50,16 +51,16 @@ public partial class MainWindow : Window
     }
     private IntPtr WndProc(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
-        if (msg != WM_DEVICECHANGE) return IntPtr.Zero;
-        switch (wParam.ToInt32())
+        if (msg == WM_DEVICECHANGE)
         {
-            case DBT_DEVICEARRIVAL:
-                Console.WriteLine("Caught dvd");
+            if(wParam.ToInt32() == DBT_DEVICEARRIVAL)
+            {
                 _ = App.Services.PD.CheckDiscDrive();
-                break;
-            case DBT_DEVICEREMOVECOMPLETE:
-                //Display error
-                break;
+            }
+            if(wParam.ToInt32() == DBT_DEVICEREMOVECOMPLETE)
+            {
+                //_ = DisplayError("Disc Ejected");
+            }
         }
         return IntPtr.Zero;
     }

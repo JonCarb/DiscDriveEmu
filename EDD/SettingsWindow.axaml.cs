@@ -29,7 +29,9 @@ public partial class SettingsWindow : Window
         RPCS3.Text = $"RPCS3 Path: {App.Services.Settings.RPCS3}";
         Cemu.Text = $"Cemu Path: {App.Services.Settings.Cemu}";
         //Add others future emu here
-        string installDirectory = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Installs");
+        MPF.Text = $"Media Preservation Frontend CLI Path: {App.Services.Settings?.MPF}";
+        
+        string installDirectory = App.Services.InstallPath;
         InstallPath.Text = $"Default Path: {installDirectory}";
         ShowInstalls(installDirectory,InstallsNames);
     }
@@ -68,7 +70,7 @@ public partial class SettingsWindow : Window
                 App.Services.Settings?.Xemu = path;
                 Xemu.Text = $"Xemu Path: {App.Services.Settings?.Xemu}";
             }
-            else if (name.Contains("Xenia"))
+            else if (name.Contains("XENIA"))
             {
                 App.Services.Settings?.Xenia = path;
                 Xenia.Text = $"Xenia Path: {App.Services.Settings?.Xenia}";
@@ -87,6 +89,12 @@ public partial class SettingsWindow : Window
             {
                 App.Services.Settings?.Cemu = path;
                 Cemu.Text = $"Cemu Path: {App.Services.Settings?.Cemu}";
+            } 
+            else if (name.Contains("MPF.CLI"))
+            {
+                App.Services.Settings?.MPF = path;
+                MPF.Text = $"Media Preservation Frontend CLI Path: {App.Services.Settings?.MPF}";
+                
             }
             App.SaveCurrentSettings();
         }
@@ -98,7 +106,7 @@ public partial class SettingsWindow : Window
 
     private async void RemoveInstall(object sender, RoutedEventArgs e)
     {
-        string installDirectory = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Installs");
+        string installDirectory = App.Services.InstallPath;
         var topLevel = TopLevel.GetTopLevel(this);
         var startLocation = await topLevel?.StorageProvider.TryGetFolderFromPathAsync(installDirectory)!;
         var folders = await topLevel?.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions

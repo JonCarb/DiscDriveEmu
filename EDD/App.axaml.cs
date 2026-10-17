@@ -31,11 +31,12 @@ public partial class App : Application
         public static TaskCompletionSource<bool> InitLoaded { get; } = new();   //Needed so Json loading finishes first before continuing
         public static ProcessDisc PD { get; } = new();
         public static SDLController SDL { get; } = new();
+        public static string InstallPath { get; } = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Installs");
     }
 
     private async Task LoadSettings()
     {
-        string destination = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Installs");
+        string destination = App.Services.InstallPath;
         if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
         
         string jsonPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Settings.json");

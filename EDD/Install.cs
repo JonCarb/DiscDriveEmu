@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ public class Install
         {
             try
             {
-                string destination = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Installs");
+                string destination = App.Services.InstallPath;
                 if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
 
                 string subfolder = System.IO.Path.Combine(destination, Path.GetFileNameWithoutExtension(gamePath));
@@ -98,6 +99,41 @@ public class Install
                 return null;
             }
         });
+        return ret;
+    }
+
+    public static async Task<string?> CallMPF(string consoleType, DriveInfo disc)
+    {        
+        var ret = await Task.Run(() =>
+        {
+            if (App.Services.Settings?.MPF == null) return null;
+            var mpf = App.Services.Settings.MPF;
+            FileInfo fi = new FileInfo(mpf);
+            
+            var combination = disc.VolumeLabel + disc.TotalSize;
+            var path = Path.Combine(App.Services.InstallPath, combination);
+            path = Path.Combine(path, combination + ".iso");
+            Console.WriteLine(path);
+            
+            if(File.Exists(path)) return path; //check if size are the same
+            
+            ProcessStartInfo psi = new ProcessStartInfo
+            {
+                WorkingDirectory = fi.DirectoryName,
+                FileName = fi.Name,
+                Arguments = consoleType + " -d " + disc.Name +  " -f " + "\"" + path + "\"",
+                UseShellExecute = true,
+                CreateNoWindow = false
+            };
+            Process? p = Process.Start(psi);
+            p?.WaitForExit();
+            Console.WriteLine("Done");
+            
+            return File.Exists(path) ? path : null;
+        });
+        
+        //since we dont check if the install was complete, make sure to compare size to see if it was a full install
+        
         return ret;
     }
 }

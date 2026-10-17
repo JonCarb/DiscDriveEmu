@@ -13,4 +13,7 @@ public class SettingsValues
     //-------------General Button Settings---------//
     public bool WillCache { get; set; }
     public bool WillAutoStart { get; set; }
+    
+    //-------------MPF---------//
+    public string? MPF { get; set; }
 }

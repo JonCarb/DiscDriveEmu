@@ -19,6 +19,7 @@ public class ProcessDisc
     
     private bool _isRealPS2Disc =  false;
     private bool _isRealPS3Disc =  false;
+    private bool _isRealXbox360Disc =  false;
 
     public void InitMainWindowForProcessDisc(MainWindow window)
     {
@@ -48,6 +49,7 @@ public class ProcessDisc
             return discDrive != null && Directory.Exists(discDrive.Name);
         });
         if (driveExists && discDrive is { IsReady: true }) { await StartProcess(discDrive); }
+        Console.WriteLine("Returned control");
     }
 
     private async Task StartProcess(DriveInfo discDrive)
@@ -56,10 +58,10 @@ public class ProcessDisc
         Console.WriteLine("Start process called");
         Console.WriteLine("Disc Drive Name: " + discDrive.Name);
         //add a wait here 
-        
+        ResetGlobalValues();
         await _mainWindow.ChangeDescription("Reading Disc");
         await _mainWindow.ChangeDiscGifToRun();
-        
+        Console.WriteLine(discDrive.TotalSize);
         if (await GetGamePath(discDrive.Name))
         {
             _emulator =  await ChooseEmulator();
@@ -68,10 +70,35 @@ public class ProcessDisc
             await PrepareGame();
             if (App.Services.Settings.WillAutoStart) await RunGame(); 
         }    
+        //Rewrite this later
+        else if(_isRealXbox360Disc)
+        {
+            _mainWindow.InstallBar.IsIndeterminate = true;
+            _mainWindow.InstallBar.IsVisible = true;
+            await _mainWindow.ChangeDescription("Installing XBOX 360 game");
+            Console.WriteLine("Xbox 360 game, will try to install");
+            string? path = await Install.CallMPF("Xbox360", discDrive);
+            _mainWindow.InstallBar.IsVisible = false;
+            if (path == null)
+            {
+                await _mainWindow.DisplayError("MPF Failed");
+            }
+            
+            else
+            {
+                _gamePath = path;
+                _emulator =  await ChooseEmulator();
+                _isDiscChecked = true;
+                await PrepareGame();
+                if (App.Services.Settings.WillAutoStart) await RunGame(); 
+            }
+            
+        }
         else
         {
             await _mainWindow.DisplayError("No games files found");
         }
+        Console.WriteLine("El bye bye");
     }
 
     private async Task<bool> GetGamePath(string discDriveRoot)
@@ -90,6 +117,13 @@ public class ProcessDisc
                 _isRealPS3Disc = true; //Disc has ps3 unpackaged game files
                 return Path.Combine(discDriveRoot, "PS3_GAME");
             }
+
+            if (Directory.Exists(Path.Combine(discDriveRoot, "VIDEO_TS")))
+            {
+                _isRealXbox360Disc = true;
+                return null;
+            }
+            
             return Directory.EnumerateFiles(discDriveRoot).FirstOrDefault();
         });
         
@@ -105,6 +139,7 @@ public class ProcessDisc
         if (_gamePath == null) return emuName;
         if (_isRealPS2Disc) return "PCSX2";
         if (_isRealPS3Disc) return "RPCS3";
+        if(_isRealXbox360Disc) return "XENIA";
         CheckForGameType cfgt = new();
         await Task.Run(() =>
         {
@@ -139,7 +174,7 @@ public class ProcessDisc
             return;
         }
         _isGameReady = false;
-        if (App.Services.Settings.WillCache)
+        if (App.Services.Settings.WillCache && !_isRealXbox360Disc)
         {
             if (_isRealPS2Disc || _isRealPS3Disc)
             {
