@@ -1,0 +1,201 @@
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+using AnimatedImage.Avalonia;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Interactivity;
+
+namespace EDD;
+
+public partial class MainWindow : Window
+{
+    private const uint WM_DEVICECHANGE = 0x0219;
+    private const int DBT_DEVICEARRIVAL = 0x8000;
+    private const int DBT_DEVICEREMOVECOMPLETE = 0x8004;
+    
+    public MainWindow()
+    {
+        InitializeComponent();
+        Console.WriteLine("No need for luck");
+        Console.WriteLine(Directory.GetCurrentDirectory());
+        _ = InitStartUp();
+    }
+
+    //Loads up components for drives, checks and visual aspects
+    private async Task InitStartUp()
+    {
+        await App.Services.InitLoaded.Task;
+        
+        App.Services.PD.InitMainWindowForProcessDisc(this);
+        App.Services.SDL.IntiSDL(this);
+        
+        //Load visual aspects first
+        InstallBtn.IsChecked = App.Services.Settings?.WillCache;
+        AutoPlayBtn.IsChecked = App.Services.Settings?.WillAutoStart;
+
+        //Check if disc is inserted
+        await Task.Delay(1000);
+        await App.Services.PD.CheckDiscDrive();
+
+        //If windows init wndproc
+        if (OperatingSystem.IsWindows())
+        {
+            Win32Properties.AddWndProcHookCallback(this, WndProc);
+        }
+        //else future linux/mac os update
+    }
+    private IntPtr WndProc(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg != WM_DEVICECHANGE) return IntPtr.Zero;
+        switch (wParam.ToInt32())
+        {
+            case DBT_DEVICEARRIVAL:
+                Console.WriteLine("Caught dvd");
+                _ = App.Services.PD.CheckDiscDrive();
+                break;
+            case DBT_DEVICEREMOVECOMPLETE:
+                //Display error
+                break;
+        }
+        return IntPtr.Zero;
+    }
+    
+    //-----------------------------------------------------//
+    //-------------------DISPLAY---------------------------//
+    //-----------------------------------------------------//
+    public async Task ChangeDescription(string description)
+    {
+        Dispatcher.Invoke(() => { Description.Text = description; });
+    }
+
+    public async Task ChangeDiscGifToRun()
+    {
+        Dispatcher.Invoke(() =>
+        {
+            ImageBehavior.SetAnimatedSource(Disc, new Uri("avares://EDD/Assets/readingDisc.gif"));
+        });
+    }
+
+    public async Task DisplayError(string error = "Disc Error")
+    {
+        
+        App.Services.PD.ResetGlobalValues();
+        Dispatcher.Invoke(() =>
+        {
+            //change to error GIF
+            ImageBehavior.SetAnimatedSource(Disc, new Uri("avares://EDD/Assets/diskError.gif"));
+            Description.Text = error;
+        });
+        
+        await Task.Run(() =>
+        {
+            int ret = mciSendString("set cdaudio door open", null, 0, IntPtr.Zero);   //Eject Disc
+            Console.WriteLine($"Eject Disc return: {ret}");
+        });
+        
+        await Task.Delay(3220); //A bit of timing here to show error animation
+
+        
+        Dispatcher.Invoke(() =>
+        {
+            //change GIF back to normal
+            ImageBehavior.SetAnimatedSource(Disc, new Uri("avares://EDD/Assets/spinningDisc.gif"));
+            Description.Text = "Please insert a Disc";
+        });
+    }
+    //-----------------------------------------------------//
+    //-----------------------------------------------------//
+    //-----------------------------------------------------//
+    public void ShutDown()
+    {
+        //Add any clean up that might be needed
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopApp)
+        {
+            Console.WriteLine("Bye Bye");
+            App.SaveCurrentSettings();
+            App.Services.SDL.CleanUpSDL();
+            desktopApp.Shutdown();
+        }
+    }
+    //-----------------------------------------------------//
+    //-----------------Buttons Actions---------------------//
+    //-----------------------------------------------------//
+    private SettingsWindow? _settingsWindow;
+    public void SettingClick(object? sender, RoutedEventArgs? e)
+    {
+        var parentWindow = TopLevel.GetTopLevel(this) as Window;
+        if (_settingsWindow != null)
+        {
+            _settingsWindow.Close();
+            _settingsWindow = null;
+        }
+        else
+        {
+            _settingsWindow = new SettingsWindow();
+            if (parentWindow != null)
+            {
+                var results = _settingsWindow.ShowDialog<string>(parentWindow);
+            }
+        }
+    }
+    private void InstallClick(object? sender, RoutedEventArgs e)
+    {
+        if (InstallBtn.IsChecked == true)
+        {
+            App.Services.Settings?.WillCache = true;
+            _ =  App.Services.PD.PrepareGame();
+            return;
+        }
+        App.Services.Settings?.WillCache = false;
+    }
+    private void AutoPlayClicked(object? sender, RoutedEventArgs e)
+    {
+        if (AutoPlayBtn.IsChecked == true)
+        {
+            App.Services.Settings?.WillAutoStart = true;
+            _ =  App.Services.PD.RunGame();
+            return;
+        }
+        App.Services.Settings?.WillAutoStart = false;
+    }
+    
+    private void QuitClick(object sender, RoutedEventArgs e)
+    {
+        ShutDown();
+    }
+    
+    //-----------------------------------------------------//
+    //-----------------Controller Actions------------------//
+    //-----------------------------------------------------//
+    
+    public void AutoPlaySwitch()
+    {
+        if(AutoPlayBtn.IsChecked == true)
+        {
+            AutoPlayBtn.IsChecked = false;
+            return;
+        }
+        AutoPlayBtn.IsChecked = true;
+    }
+
+    public void InstallSwitch()
+    {
+        if(InstallBtn.IsChecked == true)
+        {
+            InstallBtn.IsChecked = false;
+            return;
+        }
+        InstallBtn.IsChecked = true;
+    }
+    
+    //-----------------------------------------------------//
+    //-----------------------------------------------------//
+    //-----------------------------------------------------//
+    
+    [DllImport("winmm.dll", EntryPoint = "mciSendStringA", CharSet = CharSet.Ansi)]
+    protected static extern int mciSendString(string lpstrCommand, StringBuilder lpstrReturnString, int uReturnLength, IntPtr hwndCallback); 
+}

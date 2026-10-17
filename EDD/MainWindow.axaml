@@ -1,0 +1,169 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:anim="https://github.com/whistyun/AnimatedImage.Avalonia"
+        mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+        x:Class="EDD.MainWindow"
+        Title="Disc Drive">
+        
+        <Window.Background>
+                <LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
+                        <GradientStop Color="Black" Offset="0.0"/>
+                        <GradientStop Color="#FF2C1961" Offset="0.6"/>
+                        <GradientStop Color="Black" Offset="1.0"/>
+                </LinearGradientBrush>
+        </Window.Background>
+        
+        <Grid>
+                <Viewbox>
+                        <StackPanel Margin="0,0,0,50" >
+                                <Image 
+                                        x:Name = "Disc" 
+                                        Stretch = "Uniform"
+                                        anim:ImageBehavior.AnimatedSource="avares://EDD/Assets/spinningDisc.gif"          
+                                        Width="1000" 
+                                        Height="800"/>
+                                <TextBlock 
+                                        x:Name="Description" 
+                                        FontSize="49" 
+                                        HorizontalAlignment="Center" 
+                                        FontStyle="Italic" 
+                                        Foreground="White" 
+                                        Text="Please insert a Disc"
+                                        Margin="0,0,0,10" >
+                                </TextBlock>
+                                <ProgressBar 
+                                        x:Name="InstallBar" 
+                                        Minimum="0" 
+                                        Maximum="100" 
+                                        Value="0" 
+                                        Height="35"
+                                        Background="WhiteSmoke"
+                                        IsVisible="False"/>
+                        </StackPanel>
+                </Viewbox>
+                
+                <Image Source="avares://EDD/Assets/scanline.png" Stretch="Fill" IsHitTestVisible="False"/>
+                
+                <Border 
+                        BorderBrush="White"
+                        BorderThickness="2"
+                        CornerRadius="5"
+                        Width="197"
+                        Height="40"
+                        Margin="0,20,70,20"
+                        VerticalAlignment="Bottom"
+                        HorizontalAlignment="Right">
+                        <Grid>
+                                <Button 
+                                        x:Name="SettingsBtn" 
+                                        Background="{x:Null}" 
+                                        FontSize="18" 
+                                        Content="⚙️ Settings"
+                                        FontFamily="Yu Gothic UI" 
+                                        Cursor="Hand" 
+                                        Foreground="White" 
+                                        BorderBrush="Black" 
+                                        Padding="48,1"
+                                        HorizontalAlignment="Center"
+                                        Click="SettingClick"/>
+                                <Image 
+                                        x:Name="SettingBtnIcon"
+                                        Source="avares://EDD/Assets/Xbox360B.png"
+                                        Margin="195,-6,-58,-6"/>
+                        </Grid>
+                </Border>
+                
+                <Border 
+                        BorderBrush="#FF9D9AFF"
+                        BorderThickness="2"
+                        CornerRadius="5"
+                        Width="197"
+                        Height="40"
+                        Margin="70,0,0,20"
+                        VerticalAlignment="Bottom"
+                        HorizontalAlignment="Left">
+
+                        <Grid>
+                                <CheckBox 
+                                        x:Name="InstallBtn"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        FontSize="18"
+                                        Content="⬇️ Install Game"
+                                        FontFamily="Yu Gothic UI"
+                                        Cursor="Hand"
+                                        Foreground="White"
+                                        HorizontalAlignment="Center"
+                                        IsCheckedChanged="InstallClick"/>
+
+                                <Image 
+                                        x:Name="InstallBtnIcon"
+                                        Source="avares://EDD/Assets/Xbox360X.png" 
+                                        Margin="-58,-6,195,-6"/>
+                        </Grid>
+                </Border>
+                
+                <Border 
+                        BorderBrush="#FF587B7A"
+                        BorderThickness="2"
+                        CornerRadius="5"
+                        Width="197"
+                        Height="40"
+                        Margin="70,20,0,0"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Left">
+
+                        <Grid>
+                                <CheckBox 
+                                        x:Name="AutoPlayBtn"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        FontSize="18"
+                                        Content="Auto-Start"
+                                        FontFamily="Yu Gothic UI"
+                                        Cursor="Hand"
+                                        Foreground="White"
+                                        HorizontalAlignment="Center" Width="127"
+                                        IsCheckedChanged="AutoPlayClicked"/>
+
+                                <Image 
+                                        x:Name="AutoPlayBtnIcon"
+                                        Source="avares://EDD/Assets/XboxOneLB.png" 
+                                        Margin="-58,-6,195,-6"/>
+                        </Grid>
+                </Border>
+                
+                <Border 
+                        BorderBrush="Red"
+                        BorderThickness="2"
+                        CornerRadius="5"
+                        Width="197"
+                        Height="40"
+                        Margin="0,20,70,0"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Right">
+                        <Grid>
+                                <Button 
+                                        x:Name="QuitBtn" 
+                                        Background="{x:Null}" 
+                                        FontSize="18" 
+                                        Content="Quit" 
+                                        FontFamily="Yu Gothic UI" 
+                                        Cursor="Hand" 
+                                        Foreground="White" 
+                                        BorderBrush="Black" 
+                                        Padding="75,1"
+                                        HorizontalAlignment="Center"
+                                        Click="QuitClick"/>
+                                <Image 
+                                        x:Name="QuitBtnIcon"
+                                        Source="avares://EDD/Assets/Xbox360Y.png"
+                                        Margin="195,-6,-58,-6"/>
+                        </Grid>
+                </Border>
+                
+        </Grid>
+        
+</Window>

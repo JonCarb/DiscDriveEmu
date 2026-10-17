@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AnimatedImage.Avalonia" Version="2.1.4" />
+        <PackageReference Include="Avalonia" Version="12.1.1"/>
+        <PackageReference Include="Avalonia.Desktop" Version="12.1.1"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.1"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.1"/>
+        <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3">
+            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="LTRData.DiscUtils.Iso9660" Version="1.0.90" />
+        <PackageReference Include="LTRData.DiscUtils.Udf" Version="1.0.90" />
+        <PackageReference Include="SDL3-CS" Version="3.4.18" />
+        <PackageReference Include="SDL3-CS.Windows" Version="3.4.18" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Assets\spinningDisc.gif" />
+      <AvaloniaResource Include="Assets\spinningDisc.gif" />
+      <None Remove="Assets\Xbox360B.png" />
+      <AvaloniaResource Include="Assets\Xbox360B.png" />
+      <None Remove="Assets\Xbox360X.png" />
+      <AvaloniaResource Include="Assets\Xbox360X.png" />
+      <None Remove="Assets\XboxOneLB.png" />
+      <AvaloniaResource Include="Assets\XboxOneLB.png" />
+      <None Remove="Assets\Xbox360Y.png" />
+      <AvaloniaResource Include="Assets\Xbox360Y.png" />
+      <None Remove="Assets\scanline.png" />
+      <AvaloniaResource Include="Assets\scanline.png" />
+      <None Remove="Assets\diskError.gif" />
+      <AvaloniaResource Include="Assets\diskError.gif" />
+      <None Remove="Assets\readingDisc.gif" />
+      <AvaloniaResource Include="Assets\readingDisc.gif" />
+      <None Remove="Assets\PS4Circle.png" />
+      <AvaloniaResource Include="Assets\PS4Circle.png" />
+      <None Remove="Assets\PS4Cross.png" />
+      <AvaloniaResource Include="Assets\PS4Cross.png" />
+      <None Remove="Assets\PS4L1.png" />
+      <AvaloniaResource Include="Assets\PS4L1.png" />
+      <None Remove="Assets\PS4Square.png" />
+      <AvaloniaResource Include="Assets\PS4Square.png" />
+      <None Remove="Assets\PS4Triangle.png" />
+      <AvaloniaResource Include="Assets\PS4Triangle.png" />
+    </ItemGroup>
+</Project>
