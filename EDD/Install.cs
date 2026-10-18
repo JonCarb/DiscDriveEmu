@@ -102,38 +102,80 @@ public class Install
         return ret;
     }
 
-    public static async Task<string?> CallMPF(string consoleType, DriveInfo disc)
+    public static async Task<string?> CallMPF(string? consoleType, DriveInfo? disc)
     {        
+        if(consoleType == null || disc == null) return null;
         var ret = await Task.Run(() =>
         {
-            if (App.Services.Settings?.MPF == null) return null;
-            var mpf = App.Services.Settings.MPF;
-            FileInfo fi = new FileInfo(mpf);
-            
-            var combination = disc.VolumeLabel + disc.TotalSize;
-            var path = Path.Combine(App.Services.InstallPath, combination);
-            path = Path.Combine(path, combination + ".iso");
-            Console.WriteLine(path);
-            
-            if(File.Exists(path)) return path; //check if size are the same
-            
-            ProcessStartInfo psi = new ProcessStartInfo
+            try
             {
-                WorkingDirectory = fi.DirectoryName,
-                FileName = fi.Name,
-                Arguments = consoleType + " -d " + disc.Name +  " -f " + "\"" + path + "\"",
-                UseShellExecute = true,
-                CreateNoWindow = false
-            };
-            Process? p = Process.Start(psi);
-            p?.WaitForExit();
-            Console.WriteLine("Done");
-            
-            return File.Exists(path) ? path : null;
+                if (App.Services.Settings?.MPF == null) return null;
+                
+                var mpf = App.Services.Settings.MPF; //Grab the path of Media Preservation Frontend (pref the CLI ver)
+                FileInfo fi = new FileInfo(mpf);
+                
+                string? name = GetName(consoleType, disc);
+                if (name == null) return null;
+                
+                var path = Path.Combine(App.Services.InstallPath, name); //Create folder off the name
+                
+                var pathIso = Path.Combine(path, name + ".iso");               
+                var pathBin = Path.Combine(path, name + ".bin"); //For Ps2 games that's not UDF
+
+                if (File.Exists(pathIso)) return pathIso; //Better file integrity might be needed here
+                if (File.Exists(pathBin)) return pathBin;
+
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    WorkingDirectory = fi.DirectoryName,
+                    FileName = fi.Name,
+                    Arguments = consoleType + " -d " + disc.Name + " -f " + "\"" + pathIso + "\"",
+                    UseShellExecute = true,
+                    CreateNoWindow = false
+                };
+                
+                Process? p = Process.Start(psi);
+                p?.WaitForExit();
+                
+                if(File.Exists(pathBin)) return pathBin;
+                return File.Exists(pathIso) ? pathIso : null;
+            }            
+            catch (UnauthorizedAccessException ex)
+            {
+                Console.WriteLine($"Permission denied: {ex.Message}");
+                return null;
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine($"Source file not found: {ex.Message}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error has occurred: {ex.Message}");
+                return null;
+            }
         });
         
-        //since we dont check if the install was complete, make sure to compare size to see if it was a full install
-        
+        return ret;
+    }
+
+    private static string? GetName(string gameConsole, DriveInfo disc)
+    {
+        string? ret = null;
+        switch (gameConsole)
+        {
+            case "PS2":
+                ret = disc.VolumeLabel;
+                break;
+            case "PS3":
+                
+                break;
+            case "Xbox360":
+                ret  = disc.VolumeLabel + disc.TotalSize;
+                break;
+        }
+
         return ret;
     }
 }

@@ -45,7 +45,7 @@ public partial class MainWindow : Window
         //If windows init wndproc
         if (OperatingSystem.IsWindows())
         {
-            Win32Properties.AddWndProcHookCallback(this, WndProc);
+            Win32Properties.AddWndProcHookCallback(this, WndProc); //super ass, maybe stat polling like with the controllers
         }
         //else future linux/mac os update
     }
@@ -59,7 +59,7 @@ public partial class MainWindow : Window
             }
             if(wParam.ToInt32() == DBT_DEVICEREMOVECOMPLETE)
             {
-                //_ = DisplayError("Disc Ejected");
+                _ = DisplayError("Disc Ejected");
             }
         }
         return IntPtr.Zero;
@@ -138,8 +138,8 @@ public partial class MainWindow : Window
         {
             _settingsWindow = new SettingsWindow();
             if (parentWindow != null)
-            {
-                var results = _settingsWindow.ShowDialog<string>(parentWindow);
+            { 
+                _settingsWindow.ShowDialog<string>(parentWindow);
             }
         }
     }
