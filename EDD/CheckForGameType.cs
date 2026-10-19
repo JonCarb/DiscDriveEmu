@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using DiscUtils.Iso9660;
 using DiscUtils.Udf;
 
@@ -8,7 +9,42 @@ namespace EDD;
 
 public class CheckForGameType
 {
-    public bool ReadGCWII(string gamePath)
+    public async Task<App.Emulators> ChooseEmulator(string? gamePath, App.DiscType disc)
+    {
+        if (gamePath == null) return App.Emulators.None;
+        
+        //Checks meant for REAL discs
+        if (disc == App.DiscType.Xbox360 ) return App.Emulators.Xenia;
+        if (disc == App.DiscType.PS3) return App.Emulators.RPCS3;
+        if (disc == App.DiscType.PS2) return App.Emulators.PCSX2;
+        
+        //These are for discs with game files burned into them
+        App.Emulators emuName =  App.Emulators.None;
+        await Task.Run(() =>
+        {
+            string fileEx = Path.GetExtension(gamePath).ToUpper();
+            if (fileEx == ".ISO")
+            {
+                if (ReadGCWII(gamePath)) { emuName = App.Emulators.Dolphin; }       //reads 1 byte
+                else if (ReadPS3(gamePath)) { emuName = App.Emulators.RPCS3; }      //seeks and reads 12 bytes
+                else if (ReadXBOX(gamePath)) { emuName = App.Emulators.Xemu; }      //seeks and reads 20 bytes
+                else if (ReadXBOX360(gamePath)) { emuName = App.Emulators.Xenia; }  //seeks and reads 20 bytes
+                else if (ReadPS2(gamePath)) { emuName = App.Emulators.PCSX2; }      //converts whole iso (twice maybe) and checks (expensive so last case)
+                //Add other emulators
+            }
+            else
+            {
+                //Add method for Non-iso files (Wii u, etc.)
+                if (ReadWiiU(fileEx)) { emuName = App.Emulators.Cemu; }                 //Check for Cemu supported extensions
+                else if (ReadGCWIINonIso(fileEx)) { emuName = App.Emulators.Dolphin; }  //Checks for dolphin supported extensions that's not ISO
+                else if(ReadXbox360NonIso(fileEx)) { emuName = App.Emulators.Xenia; }   //Checks if file is xex for Xenia
+            }
+        });
+        
+        return emuName;
+    }
+
+    private bool ReadGCWII(string gamePath)
     {
         string bytes = "NULL";
         using (FileStream fs = new(gamePath, FileMode.Open, FileAccess.Read))
@@ -21,7 +57,8 @@ public class CheckForGameType
         //Gamecube ISO is always G, Wii is either R, S, or D
         return bytes[0] == 'G' || bytes[0] == 'R' || bytes[0] == 'S' || bytes[0] == 'D';
     }
-    public bool ReadXBOX(string gamePath)
+
+    private bool ReadXBOX(string gamePath)
     {
         const int offset = 65536;
         const int bufLength = 20;
@@ -39,7 +76,8 @@ public class CheckForGameType
             return false;
         }
     }
-    public bool ReadXBOX360(string gamePath)
+
+    private bool ReadXBOX360(string gamePath)
     {
         const int offset = 0x0FDA0000;
         const int bufLength = 20;
@@ -57,7 +95,8 @@ public class CheckForGameType
             return false;
         }
     }
-    public bool ReadPS3(string gamePath)
+
+    private bool ReadPS3(string gamePath)
     {
         const int offset = 0x800;
         const int bufLength = 12;
@@ -76,7 +115,7 @@ public class CheckForGameType
         }
     }
 
-    public bool ReadPS2(string gamePath)
+    private bool ReadPS2(string gamePath)
     {
         using (FileStream fs = new FileStream(gamePath, FileMode.Open, FileAccess.Read))
         {
@@ -114,15 +153,17 @@ public class CheckForGameType
         return false;
     }
 
-    public bool ReadGCWIINonIso(string fileExtension)
+    private bool ReadGCWIINonIso(string fileExtension)
     {
         return fileExtension is ".RVZ" or ".WBFS" or ".WIA" or ".GCZ" or ".CISO" or ".WAD";
     }
-    public bool ReadWiiU(string fileExtension)
+
+    private bool ReadWiiU(string fileExtension)
     {
         return fileExtension is ".WUX" or ".WUA" or ".WUD" or ".RPX";
     }
-    public bool ReadXbox360NonIso(string fileExtension)
+
+    private bool ReadXbox360NonIso(string fileExtension)
     {
         return (fileExtension == ".XEX");
     }

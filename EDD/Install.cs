@@ -116,7 +116,6 @@ public class Install
                 
                 string? name = GetName(consoleType, disc);
                 if (name == null) return null;
-                
                 var path = Path.Combine(App.Services.InstallPath, name); //Create folder off the name
                 
                 var pathIso = Path.Combine(path, name + ".iso");               
@@ -124,7 +123,7 @@ public class Install
 
                 if (File.Exists(pathIso)) return pathIso; //Better file integrity might be needed here
                 if (File.Exists(pathBin)) return pathBin;
-
+                
                 ProcessStartInfo psi = new ProcessStartInfo
                 {
                     WorkingDirectory = fi.DirectoryName,
@@ -169,7 +168,8 @@ public class Install
                 ret = disc.VolumeLabel;
                 break;
             case "PS3":
-                
+                //figure out
+                ret  = disc.VolumeLabel + disc.TotalSize;
                 break;
             case "Xbox360":
                 ret  = disc.VolumeLabel + disc.TotalSize;

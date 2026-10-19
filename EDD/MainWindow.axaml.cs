@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,14 +10,16 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 
 namespace EDD;
 
 public partial class MainWindow : Window
 {
-    private const uint WM_DEVICECHANGE = 0x0219;
-    private const int DBT_DEVICEARRIVAL = 0x8000;
-    private const int DBT_DEVICEREMOVECOMPLETE = 0x8004;
+    private readonly DispatcherTimer _elTick = new();
+    private DriveInfo? _disc = null;
+    private bool _inProcess = false;
+    private bool _pollingIsBusy = false;
     
     public MainWindow()
     {
@@ -37,32 +40,49 @@ public partial class MainWindow : Window
         //Load visual aspects first
         InstallBtn.IsChecked = App.Services.Settings?.WillCache;
         AutoPlayBtn.IsChecked = App.Services.Settings?.WillAutoStart;
-
-        //Check if disc is inserted
-        await Task.Delay(1000);
-        await App.Services.PD.CheckDiscDrive();
-
-        //If windows init wndproc
-        if (OperatingSystem.IsWindows())
+        
+        await Task.Run(() =>
         {
-            Win32Properties.AddWndProcHookCallback(this, WndProc); //super ass, maybe stat polling like with the controllers
-        }
-        //else future linux/mac os update
+            _elTick.Tick += CheckPoll;
+            _elTick.Interval = new TimeSpan(0, 0, 0, 4);
+            _elTick.Start();
+        });
     }
-    private IntPtr WndProc(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    
+    private async void CheckPoll(object? sender, EventArgs e)
     {
-        if (msg == WM_DEVICECHANGE)
+        if (!_inProcess)
         {
-            if(wParam.ToInt32() == DBT_DEVICEARRIVAL)
+            if (_pollingIsBusy) return;
+            _pollingIsBusy = true;
+            Console.WriteLine("Inisde polling called");
+            _disc = await GetDriveInfo();
+            if (_disc != null)
             {
-                _ = App.Services.PD.CheckDiscDrive();
+                _inProcess = true;
+                await App.Services.PD.StartProcess(_disc);
             }
-            if(wParam.ToInt32() == DBT_DEVICEREMOVECOMPLETE)
-            {
-                _ = DisplayError("Disc Ejected");
-            }
+            _pollingIsBusy = false;
         }
-        return IntPtr.Zero;
+        else
+        {
+            Console.WriteLine("Outside polling called");
+            if (_disc is not { IsReady: false }) return;
+            _inProcess = false;
+            await DisplayError("Disc Drive was opened!");
+        }
+    }
+    //Fine for now but is there a way to wait for it to finish mounting fully
+    private async Task<DriveInfo?> GetDriveInfo()
+    {
+        DriveInfo? discDrive = null;
+        var driveExists = await Task.Run(() =>
+        {
+            discDrive = DriveInfo.GetDrives().FirstOrDefault(d => d.DriveType == DriveType.CDRom);
+            return discDrive != null && Directory.Exists(discDrive.Name);
+        });
+        if (driveExists && discDrive is { IsReady: true }) { return discDrive; }
+        return null;
     }
     
     //-----------------------------------------------------//
@@ -83,7 +103,6 @@ public partial class MainWindow : Window
 
     public async Task DisplayError(string error = "Disc Error")
     {
-        
         App.Services.PD.ResetGlobalValues();
         Dispatcher.Invoke(() =>
         {
@@ -99,7 +118,6 @@ public partial class MainWindow : Window
         });
         
         await Task.Delay(3220); //A bit of timing here to show error animation
-
         
         Dispatcher.Invoke(() =>
         {
@@ -116,7 +134,6 @@ public partial class MainWindow : Window
         //Add any clean up that might be needed
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopApp)
         {
-            Console.WriteLine("Bye Bye");
             App.SaveCurrentSettings();
             App.Services.SDL.CleanUpSDL();
             desktopApp.Shutdown();
@@ -185,6 +202,7 @@ public partial class MainWindow : Window
 
     public void InstallSwitch()
     {
+        if(!InstallBtn.IsEnabled) return;
         if(InstallBtn.IsChecked == true)
         {
             InstallBtn.IsChecked = false;

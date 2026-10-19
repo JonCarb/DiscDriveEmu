@@ -25,6 +25,9 @@ public partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }
     
+    public enum Emulators { Dolphin, Xenia, PCSX2, RPCS3, Cemu, Xemu, None }
+    public enum DiscType { Custom, Xbox360, PS2, PS3 }
+    
     public static class Services
     {
         public static SettingsValues? Settings {get; set;}                      //Holds the string values for where each emulator is stored
