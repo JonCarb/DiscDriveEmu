@@ -9,11 +9,12 @@ public class SettingsValues
     public string? Cemu { get; set; }
     public string? RPCS3 { get; set; }
     public string? Xenia { get; set; }
+    public string? Duckstation { get; set; }
     
     //-------------General Button Settings---------//
     public bool WillCache { get; set; }
     public bool WillAutoStart { get; set; }
     
-    //-------------MPF---------//
-    public string? MPF { get; set; }
+    //-------------Disc Dumper---------//
+    public string? Dumper { get; set; }
 }

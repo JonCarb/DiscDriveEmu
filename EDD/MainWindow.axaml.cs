@@ -17,7 +17,6 @@ namespace EDD;
 public partial class MainWindow : Window
 {
     private readonly DispatcherTimer _elTick = new();
-    private DriveInfo? _disc = null;
     private bool _inProcess = false;
     private bool _pollingIsBusy = false;
     
@@ -51,23 +50,24 @@ public partial class MainWindow : Window
     
     private async void CheckPoll(object? sender, EventArgs e)
     {
+        DriveInfo? disc = null;
         if (!_inProcess)
         {
             if (_pollingIsBusy) return;
             _pollingIsBusy = true;
-            Console.WriteLine("Inisde polling called");
-            _disc = await GetDriveInfo();
-            if (_disc != null)
+            //Console.WriteLine("Inside polling called");
+            disc = await GetDriveInfo();
+            if (disc != null)
             {
                 _inProcess = true;
-                await App.Services.PD.StartProcess(_disc);
+                await App.Services.PD.StartProcess(disc);
             }
             _pollingIsBusy = false;
         }
         else
         {
-            Console.WriteLine("Outside polling called");
-            if (_disc is not { IsReady: false }) return;
+            //Console.WriteLine("Outside polling called");
+            if (disc is not { IsReady: false }) return;
             _inProcess = false;
             await DisplayError("Disc Drive was opened!");
         }
@@ -82,7 +82,7 @@ public partial class MainWindow : Window
             return discDrive != null && Directory.Exists(discDrive.Name);
         });
         if (driveExists && discDrive is { IsReady: true }) { return discDrive; }
-        return null;
+        return null;                                                                                      
     }
     
     //-----------------------------------------------------//
@@ -124,7 +124,10 @@ public partial class MainWindow : Window
             //change GIF back to normal
             ImageBehavior.SetAnimatedSource(Disc, new Uri("avares://EDD/Assets/spinningDisc.gif"));
             Description.Text = "Please insert a Disc";
-        });
+        });          
+        
+        //Only start polling for disc checks AFTER errors
+        _inProcess = false;
     }
     //-----------------------------------------------------//
     //-----------------------------------------------------//

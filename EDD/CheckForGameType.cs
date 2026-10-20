@@ -34,10 +34,11 @@ public class CheckForGameType
             }
             else
             {
-                //Add method for Non-iso files (Wii u, etc.)
+                //Add method for Non-iso files 
                 if (ReadWiiU(fileEx)) { emuName = App.Emulators.Cemu; }                 //Check for Cemu supported extensions
                 else if (ReadGCWIINonIso(fileEx)) { emuName = App.Emulators.Dolphin; }  //Checks for dolphin supported extensions that's not ISO
                 else if(ReadXbox360NonIso(fileEx)) { emuName = App.Emulators.Xenia; }   //Checks if file is xex for Xenia
+                else if (ReadPS1(fileEx)) { emuName = App.Emulators.Duckstation; }      //Checks for cue or chd
             }
         });
         
@@ -148,9 +149,14 @@ public class CheckForGameType
         }
         catch (Exception ex)
         {
-            //Console.WriteLine(ex.Message);
+            Console.WriteLine(ex.Message);
         }
         return false;
+    }
+
+    private bool ReadPS1(string fileExtension)
+    {
+        return (fileExtension is ".CUE" or ".CHD");
     }
 
     private bool ReadGCWIINonIso(string fileExtension)

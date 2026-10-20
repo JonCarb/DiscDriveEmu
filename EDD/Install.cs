@@ -2,6 +2,9 @@
 using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace EDD;
@@ -61,10 +64,7 @@ public class Install
                     {
                         var bytesRead = await input.ReadAsync(buffer, 0, buffer.Length);
 
-                        if (bytesRead <= 0)
-                        {
-                            break;
-                        }
+                        if (bytesRead <= 0) { break; }
 
                         await output.WriteAsync(buffer, 0, bytesRead);
 
@@ -109,26 +109,33 @@ public class Install
         {
             try
             {
-                if (App.Services.Settings?.MPF == null) return null;
+                if (App.Services.Settings == null) return null;
                 
-                var mpf = App.Services.Settings.MPF; //Grab the path of Media Preservation Frontend (pref the CLI ver)
-                FileInfo fi = new FileInfo(mpf);
+                string? dumper = App.Services.Settings.Dumper;
+                Console.WriteLine($"Dumper: {dumper}");
+                if (dumper == null) return null;
                 
                 string? name = GetName(consoleType, disc);
+                Console.WriteLine($"Name: {name}");
                 if (name == null) return null;
-                var path = Path.Combine(App.Services.InstallPath, name); //Create folder off the name
                 
-                var pathIso = Path.Combine(path, name + ".iso");               
-                var pathBin = Path.Combine(path, name + ".bin"); //For Ps2 games that's not UDF
+                var path = Path.Combine(App.Services.InstallPath, name);
+                Console.WriteLine($"path: {path}");
+                
+                string? file = null;
+                if (Directory.Exists(path))
+                { 
+                    file = Directory.EnumerateFiles(path).FirstOrDefault(f => Path.GetExtension(f) is ".iso" or ".bin");
+                    if (file != null) return file;
+                }
+                else Directory.CreateDirectory(path);
 
-                if (File.Exists(pathIso)) return pathIso; //Better file integrity might be needed here
-                if (File.Exists(pathBin)) return pathBin;
-                
+                FileInfo fi = new(dumper);
                 ProcessStartInfo psi = new ProcessStartInfo
                 {
                     WorkingDirectory = fi.DirectoryName,
                     FileName = fi.Name,
-                    Arguments = consoleType + " -d " + disc.Name + " -f " + "\"" + pathIso + "\"",
+                    Arguments = $"disc --drive=\"{disc.Name[..2]}\" --image-path=\"{path}\" --image-name=\"{name}\"",
                     UseShellExecute = true,
                     CreateNoWindow = false
                 };
@@ -136,8 +143,7 @@ public class Install
                 Process? p = Process.Start(psi);
                 p?.WaitForExit();
                 
-                if(File.Exists(pathBin)) return pathBin;
-                return File.Exists(pathIso) ? pathIso : null;
+                return Directory.EnumerateFiles(path).FirstOrDefault(f => Path.GetExtension(f) is ".iso" or ".bin");
             }            
             catch (UnauthorizedAccessException ex)
             {
@@ -168,14 +174,51 @@ public class Install
                 ret = disc.VolumeLabel;
                 break;
             case "PS3":
-                //figure out
-                ret  = disc.VolumeLabel + disc.TotalSize;
+                ret = GetPs3Name(disc.RootDirectory.FullName);
+                ret = ret?.Replace("\0", "");
                 break;
             case "Xbox360":
-                ret  = disc.VolumeLabel + disc.TotalSize;
+                ret  = GetXbox360Name(disc);
                 break;
+            //to do add original xbox
         }
 
         return ret;
+    }
+    private static string? GetPs3Name(string discRoot)
+    {
+        const int offset = 0x220;
+        const int bufLength = 16;
+        Console.WriteLine(discRoot);
+        string? file = Directory.EnumerateFiles(discRoot).FirstOrDefault("PS3_DISC.SFB");
+        try
+        {
+            using FileStream fs = new(file, FileMode.Open, FileAccess.Read);
+            fs.Seek(offset, SeekOrigin.Begin);
+            var buf = new byte[bufLength];
+            fs.ReadExactly(buf, 0, bufLength);
+            return System.Text.Encoding.ASCII.GetString(buf);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
+            return null;
+        }
+    }
+
+    private static string? GetXbox360Name(DriveInfo? disc)
+    {
+        if(disc == null) return null;
+        try
+        {
+            string? file = Directory.EnumerateFiles(disc.RootDirectory.FullName).FirstOrDefault("Default.XEX");
+            using FileStream stream = File.OpenRead(file);
+            byte[] hashBytes = SHA256.HashData(stream);
+            return disc.VolumeLabel + Convert.ToHexString(hashBytes)[..8].ToLowerInvariant();
+        }
+        catch
+        {
+            return disc.VolumeLabel + disc.TotalSize;
+        }
     }
 }

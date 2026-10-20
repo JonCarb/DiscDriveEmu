@@ -28,8 +28,9 @@ public partial class SettingsWindow : Window
         PCSX2.Text = $"PCSX2 Path: {App.Services.Settings.PCSX2}";
         RPCS3.Text = $"RPCS3 Path: {App.Services.Settings.RPCS3}";
         Cemu.Text = $"Cemu Path: {App.Services.Settings.Cemu}";
+        Duckstation.Text = $"Duckstation Path: {App.Services.Settings.Duckstation}";
         //Add others future emu here
-        MPF.Text = $"Media Preservation Frontend CLI Path: {App.Services.Settings?.MPF}";
+        Dumper.Text = $"Disc Dumper Path: {App.Services.Settings?.Dumper}";
         
         string installDirectory = App.Services.InstallPath;
         InstallPath.Text = $"Default Path: {installDirectory}";
@@ -90,11 +91,15 @@ public partial class SettingsWindow : Window
                 App.Services.Settings?.Cemu = path;
                 Cemu.Text = $"Cemu Path: {App.Services.Settings?.Cemu}";
             } 
-            else if (name.Contains("MPF.CLI"))
+            else if (name.Contains("DUCKSTATION"))
             {
-                App.Services.Settings?.MPF = path;
-                MPF.Text = $"Media Preservation Frontend CLI Path: {App.Services.Settings?.MPF}";
-                
+                App.Services.Settings?.Duckstation = path;
+                Duckstation.Text = $"Duckstation Path: {App.Services.Settings?.Duckstation}";
+            }
+            else if (name.Contains("REDUMPER"))
+            {
+                App.Services.Settings?.Dumper = path;
+                Dumper.Text = $"Disc Dumper Path: {App.Services.Settings?.Dumper}";
             }
             App.SaveCurrentSettings();
         }

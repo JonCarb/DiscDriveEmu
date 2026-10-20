@@ -25,8 +25,9 @@
                         <TextBlock x:Name="PCSX2" Text="PCSX2 Path:" FontStyle="Italic" Foreground="#FFCCCCCC" FontSize="22" Margin="10,0,10,5"/>
                         <TextBlock x:Name="RPCS3" Text="RPCS3 Path:"  FontStyle="Italic" Foreground="#FFCCCCCC" FontSize="22" Margin="10,0,10,5"/>
                         <TextBlock x:Name="Cemu" Text="Cemu Path:"  FontStyle="Italic" Foreground="#FFCCCCCC" FontSize="22" Margin="10,0,10,5"/>
+                        <TextBlock x:Name="Duckstation" Text="Duckstation Path:"  FontStyle="Italic" Foreground="#FFCCCCCC" FontSize="22" Margin="10,0,10,5"/>
                         
-                        <TextBlock x:Name="MPF" Text="Media Preservation Frontend Path:"  FontStyle="Italic" Foreground="#FFCCCCCC" FontSize="22" Margin="10,0,10,5"/>
+                        <TextBlock x:Name="Dumper" Text="Disc Dumper Path:"  FontStyle="Italic" Foreground="#FFCCCCCC" FontSize="22" Margin="10,0,10,5"/>
 
                         <Button 
                             x:Name="AddPath" 

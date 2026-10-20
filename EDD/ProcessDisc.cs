@@ -35,7 +35,7 @@ public class ProcessDisc
 
     public async Task StartProcess(DriveInfo? discDrive)
     {
-        if(discDrive == null|| _mainWindow == null || App.Services.Settings == null) return;
+        if(discDrive == null || _mainWindow == null || App.Services.Settings == null) return;
         Console.WriteLine("Start process called");
         
         ResetGlobalValues();
@@ -73,8 +73,7 @@ public class ProcessDisc
             }
             
             //PS3 Disc Check
-            if (File.Exists(Path.Combine(discDriveRoot, "PS3_DISC.SFB")) 
-                && Directory.Exists(Path.Combine(discDriveRoot, "PS3_GAME")))
+            if (File.Exists(Path.Combine(discDriveRoot, "PS3_DISC.SFB")) && Directory.Exists(Path.Combine(discDriveRoot, "PS3_GAME")))
             {
                 _discType = App.DiscType.PS3; //Disc has ps3 unpackaged game files
                 return Path.Combine(discDriveRoot, "PS3_GAME");
@@ -87,14 +86,14 @@ public class ProcessDisc
                 return discDriveRoot;
             }
             
-            //Else discType is custom, and we return the first file we can find
-            return Directory.EnumerateFiles(discDriveRoot).FirstOrDefault();
+            //Else we assume the disc is custom. First we try to find spec iso/cue else we return the first file we can find
+            return Directory.EnumerateFiles(discDriveRoot) .FirstOrDefault(f => Path.GetExtension(f) is ".iso" or ".cue") ?? 
+                   Directory.EnumerateFiles(discDriveRoot).FirstOrDefault();
         });
         
         return fileName;
     }
     
-
     //Will automatically be called by disc being/inserted. Can also be called when install button is TURNED on
     public async Task PrepareGame()
     {
@@ -103,10 +102,10 @@ public class ProcessDisc
         //if game is already prepared, move it one state back so user cant start the game
         if(_state == ProcessState.GamePrepared) _state = ProcessState.DiscChecked;
         
-        //For specific discs like xbox 360, installation is needed to play
-        if (_discType == App.DiscType.Xbox360 && !App.Services.Settings.WillCache)
+        //Deny for now
+        if (_emulator == App.Emulators.Duckstation && App.Services.Settings.WillCache)
         {
-            await _mainWindow.DisplayError("You need to install this game to play!");
+            await _mainWindow.DisplayError("Installing PS1 games is currently unsupported");
             return;
         }
         
@@ -119,18 +118,17 @@ public class ProcessDisc
             //Real discs need to be installed through MPF
             if (_discType != App.DiscType.Custom)
             {
-                Console.WriteLine("Real disc");
                 _mainWindow.InstallBtn.IsEnabled = false;
                 ret = await InstallWithMPF();
                 _mainWindow.InstallBtn.IsEnabled = true;
             }
-            //"Copied" single file discs need are installed through custom installer
+            //"Burned" single file discs are installed through the custom installer
             else
             {
                 ret = await InstallSingleFile();
             }
             
-            //Handle errors that's returned
+            //Handle errors that are returned
             if (ret == null)
             {
                 await _mainWindow.DisplayError("Installation failed!");
@@ -138,7 +136,16 @@ public class ProcessDisc
             }
             
             _gamePath = ret;
+            //After we switch to installation path instead of disc, its now custom 
+            _discType = App.DiscType.Custom;
         } 
+        
+        //For specific discs like the xboxs, installation is needed to play
+        if (_discType == App.DiscType.Xbox360 || _discType == App.DiscType.Xbox)
+        {
+            await _mainWindow.DisplayError("You need to install this game to play!");
+            return;
+        }
         
         _state =  ProcessState.GamePrepared;
         await _mainWindow.ChangeDescription("Press Start To Play");
@@ -222,6 +229,10 @@ public class ProcessDisc
                 case App.Emulators.Xenia:
                     if (!File.Exists(App.Services.Settings.Xenia)) { await _mainWindow.DisplayError("NO Xenia (XBOX 360) PATH"); return; }
                     System.Diagnostics.Process.Start(App.Services.Settings.Xenia, "--fullscreen " + "\"" + _gamePath + "\"");
+                    break;
+                case App.Emulators.Duckstation:
+                    if (!File.Exists(App.Services.Settings.Duckstation)) { await _mainWindow.DisplayError("NO Duckstation (PS1) PATH"); return; }
+                    System.Diagnostics.Process.Start(App.Services.Settings.Duckstation, "-fullscreen " + "\"" + _gamePath + "\"");
                     break;
                 default:
                     await _mainWindow.DisplayError("Unknown/Unsupported Disc"); 
