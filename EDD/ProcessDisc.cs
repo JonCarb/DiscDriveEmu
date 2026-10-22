@@ -86,7 +86,7 @@ public class ProcessDisc
                 return discDriveRoot;
             }
             
-            //Else we assume the disc is custom. First we try to find spec iso/cue else we return the first file we can find
+            //we assume the disc is custom. First we try to find spec iso/cue else we return the first file we can find
             return Directory.EnumerateFiles(discDriveRoot) .FirstOrDefault(f => Path.GetExtension(f) is ".iso" or ".cue") ?? 
                    Directory.EnumerateFiles(discDriveRoot).FirstOrDefault();
         });

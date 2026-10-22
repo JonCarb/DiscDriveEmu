@@ -30,10 +30,11 @@
                                         x:Name="Description" 
                                         FontSize="49" 
                                         HorizontalAlignment="Center" 
+                                        Padding="2" 
                                         FontStyle="Italic" 
                                         Foreground="White" 
                                         Text="Please insert a Disc"
-                                        Margin="0,0,0,10" >
+                                        Margin="1,1,1,10" >
                                 </TextBlock>
                                 <ProgressBar 
                                         x:Name="InstallBar" 

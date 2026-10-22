@@ -12,12 +12,18 @@ public class CheckForGameType
     public async Task<App.Emulators> ChooseEmulator(string? gamePath, App.DiscType disc)
     {
         if (gamePath == null) return App.Emulators.None;
-        
-        //Checks meant for REAL discs
-        if (disc == App.DiscType.Xbox360 ) return App.Emulators.Xenia;
-        if (disc == App.DiscType.PS3) return App.Emulators.RPCS3;
-        if (disc == App.DiscType.PS2) return App.Emulators.PCSX2;
-        
+
+        switch (disc)
+        {
+            //Checks meant for REAL discs
+            case App.DiscType.Xbox360:
+                return App.Emulators.Xenia;
+            case App.DiscType.PS3:
+                return App.Emulators.RPCS3;
+            case App.DiscType.PS2:
+                return App.Emulators.PCSX2;
+        }
+
         //These are for discs with game files burned into them
         App.Emulators emuName =  App.Emulators.None;
         await Task.Run(() =>
@@ -73,7 +79,7 @@ public class CheckForGameType
         }
         catch (Exception ex)
         {
-            Debug.WriteLine(ex.Message);
+            Console.WriteLine(ex.Message);
             return false;
         }
     }
@@ -92,7 +98,7 @@ public class CheckForGameType
         }
         catch (Exception ex)
         {
-            Debug.WriteLine(ex.Message);
+            Console.WriteLine(ex.Message);
             return false;
         }
     }
@@ -111,7 +117,7 @@ public class CheckForGameType
         }
         catch (Exception ex)
         {
-            Debug.WriteLine(ex.Message);
+            Console.WriteLine(ex.Message);
             return false;
         }
     }
@@ -135,7 +141,7 @@ public class CheckForGameType
         }
         catch (Exception ex)
         {
-            Debug.WriteLine(ex.Message);
+            Console.WriteLine(ex.Message);
         }
         return false;
     }

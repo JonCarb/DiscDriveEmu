@@ -201,7 +201,7 @@ public class Install
         }
         catch (Exception ex)
         {
-            Debug.WriteLine(ex.Message);
+            Console.WriteLine(ex.Message);
             return null;
         }
     }

@@ -10,7 +10,7 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
             <StackPanel>
                 <Border
-                    Height="332"
+                    Height="385"
                     Margin="105,26,105,0"
                     Background="#FF525252"
                     BorderBrush="White"
